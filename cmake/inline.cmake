@@ -1,0 +1,13 @@
+foreach (KEYWORD "inline" "__inline__" "__inline")
+	if (NOT DEFINED C_INLINE)
+		try_compile (C_HAS_${KEYWORD} "${CMAKE_CURRENT_BINARY_DIR}" "${CMAKE_CURRENT_LIST_DIR}/test.c" COMPILE_DEFINITIONS "-Dinline=${KEYWORD}")
+		if (C_HAS_${KEYWORD})
+			set (C_INLINE TRUE)
+			add_definitions ("-Dinline=${KEYWORD}")
+		endif (C_HAS_${KEYWORD})
+	endif (NOT DEFINED C_INLINE)
+endforeach (KEYWORD)
+
+if (NOT DEFINED C_INLINE)
+	add_definitions ("-Dinline=")
+endif (NOT DEFINED C_INLINE)

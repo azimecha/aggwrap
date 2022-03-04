@@ -1,4 +1,6 @@
 Copyright (c) 2022 Azimecha <azimecha@outlook.com>
+Portions Copyright (C) 2002-2005 Maxim Shemanarev (http://www.antigrain.com)
+Portions Copyright (c) 2017 Sean Barrett
 
 Redistribution and use in source and binary forms, with or without modification, are permitted provided that the following conditions are met:
 
