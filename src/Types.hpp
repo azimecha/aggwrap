@@ -9,8 +9,17 @@
 #include <agg_basics.h>
 #include <agg_pixfmt_rgba.h>
 
+#ifdef AGGWRAP_NO_DELETED_FUNC
+#define AGGWRAP_NOCOPY(t,tt) t(const tt& robj)
+#define AGGWRAP_NOASSIGN(tt) tt& operator=(const tt& robj)
+#else
 #define AGGWRAP_NOCOPY(t,tt) t(const tt& robj) = delete
 #define AGGWRAP_NOASSIGN(tt) tt& operator=(const tt& robj) = delete
+#endif
+
+#ifdef AGGWRAP_NO_NULLPTR
+#define nullptr ((void*)0)
+#endif
 
 #define AGGWRAP_EXPIMPL extern "C"
 
@@ -19,10 +28,10 @@ namespace AGGWrap {
 	class UniquePointer {
 	public:
 		constexpr inline UniquePointer(void) {
-			m_pData = nullptr;
-			m_procDtor = nullptr;
+			m_pData = (T*)nullptr;
+			m_procDtor = (AwDataDestructor_t)nullptr;
 		}
-
+		
 		inline UniquePointer(UniquePointer<T>& rupSteal) {
 			m_pData = rupSteal.m_pData;
 			m_procDtor = rupSteal.m_procDtor;
@@ -39,8 +48,8 @@ namespace AGGWrap {
 			if (&rupStealFrom != this) {
 				m_pData = rupStealFrom.m_pData;
 				m_procDtor = rupStealFrom.m_procDtor;
-				rupStealFrom.m_pData = nullptr;
-				rupStealFrom.m_procDtor = nullptr;
+				rupStealFrom.m_pData = (T*)nullptr;
+				rupStealFrom.m_procDtor = (AwDataDestructor_t)nullptr;
 			}
 		}
 
@@ -48,8 +57,8 @@ namespace AGGWrap {
 			T* pData = m_pData;
 			AwDataDestructor_t procDtor = m_procDtor;
 
-			m_pData = nullptr; 
-			m_procDtor = nullptr;
+			m_pData = (T*)nullptr; 
+			m_procDtor = (AwDataDestructor_t)nullptr;
 
 			if (procDtor)
 				procDtor((void*)pData);
@@ -94,7 +103,7 @@ namespace AGGWrap {
 	class Array {
 	public:
 		constexpr inline Array(void) { 
-			m_parrItems = nullptr; 
+			m_parrItems = (T*)nullptr; 
 			m_nItems = 0; 
 		}
 
@@ -122,7 +131,7 @@ namespace AGGWrap {
 			T* parrItems = m_parrItems;
 
 			m_nItems = 0;
-			m_parrItems = nullptr;
+			m_parrItems = (T*)nullptr;
 
 			if (parrItems) delete[] m_parrItems;
 		}
@@ -198,7 +207,7 @@ namespace AGGWrap {
 
 		~SharedObject(void) {
 			T* pObject = m_pObject;
-			m_pObject = nullptr;
+			m_pObject = (T*)nullptr;
 			delete pObject;
 		}
 

@@ -4,6 +4,10 @@ file (GLOB AGG_H_FILES *.h)
 add_library (AGG STATIC ${AGG_CPP_FILES} ${AGG_H_FILES})
 target_compile_definitions (AGG PUBLIC AGG_STATIC_DEFINE)
 
+if (MSVC)
+	target_compile_options (AGG PRIVATE /wd4244)
+endif ()
+
 target_include_directories (AGG
 	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
 	PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/exports)

@@ -124,7 +124,7 @@ void AGGWrap::LinearGradientBrush::PerformFill(Renderer& rrend, Rasterizer& rras
 		s_GenerateLinearGradient(gradY, arrColors, nHeight, xlat, rrend, rrast);
 	} else {
 		double d2 = 100.0; // no idea
-		xlat *= agg::trans_affine_scaling(sqrt(nWidth * nWidth + nHeight * nHeight) / d2);
+		xlat *= agg::trans_affine_scaling(sqrt((double)nWidth * nWidth + (double)nHeight * nHeight) / d2);
 		xlat *= agg::trans_affine_rotation(m_fAngle);
 		xlat *= agg::trans_affine_translation(rrast.min_x(), rrast.min_y());
 		xlat.invert();

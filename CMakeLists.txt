@@ -1,6 +1,9 @@
 cmake_minimum_required (VERSION 3.0)
 
 include (cmake/inline.cmake)
+include (cmake/constexpr.cmake)
+include (cmake/delfunc.cmake)
+include (cmake/nullptr.cmake)
 
 option (WRAPPER_SHARED "Build aggwrap as shared library" ON)
 option (WRAPPER_STATIC_CRT "Static link C runtime to aggwrap" OFF)

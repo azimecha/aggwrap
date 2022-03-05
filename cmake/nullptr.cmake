@@ -1,0 +1,6 @@
+try_compile (AGGWRAP_NULLPTR_AVAIL "${CMAKE_CURRENT_BINARY_DIR}" 
+	SOURCES "${CMAKE_CURRENT_LIST_DIR}/nullptr_test.cpp")
+	
+if (NOT AGGWRAP_NULLPTR_AVAIL)
+	add_definitions ("-DAGGWRAP_NO_NULLPTR")
+endif ()
