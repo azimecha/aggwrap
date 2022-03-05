@@ -31,7 +31,12 @@ namespace AGGWrap {
 
 		inline const agg::path_storage& GetStorage(void) const { return m_storage; }
 
-		inline Path& operator+(const Path& rpath) { 
+		template<typename AGGPathType>
+		void AddAGGPath(AGGPathType& rpath) {
+			m_storage.concat_path(rpath);
+		}
+
+		inline Path operator+(const Path& rpath) { 
 			Path p(*this);
 			p.AddPath(rpath);
 			return p;

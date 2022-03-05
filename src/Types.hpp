@@ -103,19 +103,22 @@ namespace AGGWrap {
 			m_nItems = nItems; 
 		}
 
-		inline Array(const Array<T>& rarr) {
+		Array(const Array<T>& rarr) {
 			m_parrItems = new T[rarr.m_nItems];
 			m_nItems = rarr.m_nItems;
 			memcpy((void*)m_parrItems, (const void*)rarr.m_parrItems, rarr.m_nItems);
 		}
 
-		inline Array<T>& operator=(const Array<T>& rarr) {
-			m_parrItems = new T[rarr.m_nItems];
-			m_nItems = rarr.m_nItems;
-			memcpy((void*)m_parrItems, (const void*)rarr.m_parrItems, rarr.m_nItems);
+		Array<T>& operator=(const Array<T>& rarr) {
+			if (&rarr != this) {
+				m_parrItems = new T[rarr.m_nItems];
+				m_nItems = rarr.m_nItems;
+				memcpy((void*)m_parrItems, (const void*)rarr.m_parrItems, rarr.m_nItems);
+			}
+			return *this;
 		}
 
-		inline ~Array(void) {
+		~Array(void) {
 			T* parrItems = m_parrItems;
 
 			m_nItems = 0;
@@ -175,6 +178,58 @@ namespace AGGWrap {
 			}
 		}
 	}
+
+	class NullPointerException : Exception {
+	public:
+		const char* GetMessage(void) const override;
+		virtual ~NullPointerException(void);
+	};
+
+	template<typename T>
+	class SharedObject {
+	private:
+		SharedObject(T* pObject, int nInitRefCount) {
+			if (pObject == nullptr)
+				throw NullPointerException();
+
+			m_pObject = pObject;
+			m_nRefCount = nInitRefCount;
+		}
+
+		~SharedObject(void) {
+			T* pObject = m_pObject;
+			m_pObject = nullptr;
+			delete pObject;
+		}
+
+	public:
+		static inline SharedObject<T>* Create(T* pObject, int nInitRefCount) {
+			return new SharedObject<T>(pObject, nInitRefCount);
+		}
+		
+		inline void AddRef(void) { m_nRefCount++; }
+		inline void RemoveRef(void) {
+			m_nRefCount--;
+			if (m_nRefCount == 0)
+				delete this;
+		}
+
+		inline T* GetPointer(void) { return m_pObject; }
+		inline const T* GetPointer(void) const { return m_pObject; }
+
+		inline T* operator->(void) { return m_pObject; }
+		inline const T* operator->(void) const { return m_pObject; }
+
+		inline T& operator*(void) { return *m_pObject; }
+		inline const T& operator*(void) const { return *m_pObject; }
+
+	private:
+		AGGWRAP_NOCOPY(SharedObject, SharedObject<T>);
+		AGGWRAP_NOASSIGN(SharedObject<T>);
+
+		T* m_pObject;
+		int m_nRefCount;
+	};
 }
 
 #endif

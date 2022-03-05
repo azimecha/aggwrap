@@ -26,8 +26,8 @@ namespace AGGWrap {
 		inline int GetStride(void) const { return m_nWidth * sizeof(Sample) * 4; }
 		inline int GetDataSize(void) const { return GetStride() * m_nHeight; }
 
-		inline PixelFormat GetFormatAdaptor(void) { return m_fmt; }
-		inline const PixelFormat GetFormatAdaptor(void) const { return m_fmt; }
+		inline PixelFormat& GetFormatAdaptor(void) { return m_fmt; }
+		inline const PixelFormat& GetFormatAdaptor(void) const { return m_fmt; }
 
 		inline Sample* GetDataPointer(void) { return m_upData.GetPointer(); }
 		inline const Sample* GetDataPointer(void) const { return m_upData.GetPointer(); }

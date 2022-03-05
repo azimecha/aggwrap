@@ -128,7 +128,8 @@ void AGGWrap::Path::AddPolygon(AwPathPoint_p parrPoints, int nPoints) {
 }
 
 void AGGWrap::Path::AddPath(const Path& rpath) {
-	m_storage.concat_path(rpath.m_storage);
+	agg::path_storage storTemp(rpath.m_storage);
+	m_storage.concat_path(storTemp);
 }
 
 void AGGWrap::Path::MoveTo(AwPathCoord_t x, AwPathCoord_t y) {
@@ -158,8 +159,9 @@ AGGWRAP_EXPIMPL AwPath_h AGGWRAP_FUNC AwCreatePath(void) {
 AGGWRAP_EXPIMPL AwBool_t AGGWRAP_FUNC AwAddPathRectangle(AwPath_h hPath, AwPathCoord_t x, AwPathCoord_t y, AwPathCoord_t w, AwPathCoord_t h) {
 	try {
 		((Path*)hPath)->AddRectangle(x, y, w, h);
+		return AGGWRAP_TRUE;
 	} catch (...) {
-		return false;
+		return AGGWRAP_FALSE;
 	}
 }
 
@@ -168,24 +170,27 @@ AGGWRAP_EXPIMPL AwBool_t AGGWRAP_FUNC AwAddPathRoundedRectangle(AwPath_h hPath, 
 {
 	try {
 		((Path*)hPath)->AddRoundedRectangle(x, y, w, h, fRadius);
+		return AGGWRAP_TRUE;
 	} catch (...) {
-		return false;
+		return AGGWRAP_FALSE;
 	}
 }
 
 AGGWRAP_EXPIMPL AwBool_t AGGWRAP_FUNC AwAddPathCircle(AwPath_h hPath, AwPathCoord_t x, AwPathCoord_t y, AwPathCoord_t fRadius) {
 	try {
 		((Path*)hPath)->AddCircle(x, y, fRadius);
+		return AGGWRAP_TRUE;
 	} catch (...) {
-		return false;
+		return AGGWRAP_FALSE;
 	}
 }
 
 AGGWRAP_EXPIMPL AwBool_t AGGWRAP_FUNC AwAddPathEllipse(AwPath_h hPath, AwPathCoord_t x, AwPathCoord_t y, AwPathCoord_t w, AwPathCoord_t h) {
 	try {
 		((Path*)hPath)->AddEllipse(x, y, w, h);
+		return AGGWRAP_TRUE;
 	} catch (...) {
-		return false;
+		return AGGWRAP_FALSE;
 	}
 }
 
@@ -194,8 +199,9 @@ AGGWRAP_EXPIMPL AwBool_t AGGWRAP_FUNC AwAddPathArc(AwPath_h hPath, AwPathCoord_t
 {
 	try {
 		((Path*)hPath)->AddArc(x, y, w, h, fStartAngle, fSweepAngle);
+		return AGGWRAP_TRUE;
 	} catch (...) {
-		return false;
+		return AGGWRAP_FALSE;
 	}
 }
 
@@ -204,8 +210,9 @@ AGGWRAP_EXPIMPL AwBool_t AGGWRAP_FUNC AwAddPathChord(AwPath_h hPath, AwPathCoord
 {
 	try {
 		((Path*)hPath)->AddChord(x, y, w, h, fStartAngle, fSweepAngle);
+		return AGGWRAP_TRUE;
 	} catch (...) {
-		return false;
+		return AGGWRAP_FALSE;
 	}
 }
 
@@ -214,16 +221,18 @@ AGGWRAP_EXPIMPL AwBool_t AGGWRAP_FUNC AwAddPathPieSlice(AwPath_h hPath, AwPathCo
 {
 	try {
 		((Path*)hPath)->AddPieSlice(x, y, w, h, fStartAngle, fSweepAngle);
+		return AGGWRAP_TRUE;
 	} catch (...) {
-		return false;
+		return AGGWRAP_FALSE;
 	}
 }
 
 AGGWRAP_EXPIMPL AwBool_t AGGWRAP_FUNC AwAddPathLine(AwPath_h hPath, AwPathCoord_t x1, AwPathCoord_t y1, AwPathCoord_t x2, AwPathCoord_t y2){
 	try {
 		((Path*)hPath)->AddLine(x1, y1, x2, y2);
+		return AGGWRAP_TRUE;
 	} catch (...) {
-		return false;
+		return AGGWRAP_FALSE;
 	}
 }
 
@@ -232,69 +241,72 @@ AGGWRAP_EXPIMPL AwBool_t AGGWRAP_FUNC AwAddPathTriangle(AwPath_h hPath, AwPathCo
 {
 	try {
 		((Path*)hPath)->AddTriangle(x1, y1, x2, y2, x3, y3);
+		return AGGWRAP_TRUE;
 	} catch (...) {
-		return false;
+		return AGGWRAP_FALSE;
 	}
 }
 
 AGGWRAP_EXPIMPL AwBool_t AGGWRAP_FUNC AwAddPathPolyline(AwPath_h hPath, AwPathPoint_p parrPoints, int nPoints){
 	try {
 		((Path*)hPath)->AddPolyline(parrPoints, nPoints);
+		return AGGWRAP_TRUE;
 	} catch (...) {
-		return false;
+		return AGGWRAP_FALSE;
 	}
 }
 
 AGGWRAP_EXPIMPL AwBool_t AGGWRAP_FUNC AwAddPathPolygon(AwPath_h hPath, AwPathPoint_p parrPoints, int nPoints){
 	try {
 		((Path*)hPath)->AddPolygon(parrPoints, nPoints);
+		return AGGWRAP_TRUE;
 	} catch (...) {
-		return false;
+		return AGGWRAP_FALSE;
 	}
 }
 
 AGGWRAP_EXPIMPL AwBool_t AGGWRAP_FUNC AwAddPath(AwPath_h hTargetPath, AwPath_h hPathToAdd) {
 	try {
 		((Path*)hTargetPath)->AddPath(*(Path*)hPathToAdd);
-		return true;
+		return AGGWRAP_TRUE;
 	} catch (...) {
-		return false;
+		return AGGWRAP_FALSE;
 	}
 }
 
 AGGWRAP_EXPIMPL AwBool_t AGGWRAP_FUNC AwPathMoveTo(AwPath_h hPath, AwPathCoord_t x, AwPathCoord_t y) {
 	try {
 		((Path*)hPath)->MoveTo(x, y);
-		return true;
+		return AGGWRAP_TRUE;
 	} catch (...) {
-		return false;
+		return AGGWRAP_FALSE;
 	}
 }
 
 AGGWRAP_EXPIMPL AwBool_t AGGWRAP_FUNC AwPathLineTo(AwPath_h hPath, AwPathCoord_t x, AwPathCoord_t y) {
 	try {
 		((Path*)hPath)->LineTo(x, y);
-		return true;
+		return AGGWRAP_TRUE;
 	} catch (...) {
-		return false;
+		return AGGWRAP_FALSE;
 	}
 }
 
 AGGWRAP_EXPIMPL AwBool_t AGGWRAP_FUNC AwClosePathShape(AwPath_h hPath) {
 	try {
 		((Path*)hPath)->CloseShape();
-		return true;
+		return AGGWRAP_TRUE;
 	} catch (...) {
-		return false;
+		return AGGWRAP_FALSE;
 	}
 }
 
 AGGWRAP_EXPIMPL AwBool_t AGGWRAP_FUNC AwClearPath(AwPath_h hPath) {
 	try {
 		((Path*)hPath)->Clear();
-		return true;
+		return AGGWRAP_TRUE;
 	} catch (...) {
-		return false;
+		return AGGWRAP_FALSE;
 	}
 }
 

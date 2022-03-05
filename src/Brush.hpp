@@ -20,7 +20,11 @@ namespace AGGWrap {
 		typedef agg::rasterizer_scanline_aa<> Rasterizer;
 
 		virtual ~Brush(void);
-		virtual void PerformFill(Renderer& rrend, Rasterizer& rrast, bool bFast) = 0;
+		virtual void PerformFill(Renderer& rrend, Rasterizer& rrast, bool bFast) const = 0;
+
+		static inline Brush& FromHandle(AwBrush_h hBrush) {
+			return **(SharedObject<Brush>*)hBrush;
+		}
 	};
 
 	class SolidBrush : public Brush {
@@ -33,7 +37,7 @@ namespace AGGWrap {
 
 		inline Color GetColor(void) const { return m_clr; }
 
-		void PerformFill(Renderer& rrend, Rasterizer& rrast, bool bFast) override;
+		void PerformFill(Renderer& rrend, Rasterizer& rrast, bool bFast) const override;
 
 	private:
 		AGGWRAP_NOASSIGN(SolidBrush);
@@ -42,8 +46,14 @@ namespace AGGWrap {
 
 	struct GradientStop {
 		typedef float Position;
+
 		Position StopPosition;
 		Color StopColor;
+
+		inline bool operator>(const GradientStop& rstopOther) const { return StopPosition < rstopOther.StopPosition; }
+		inline bool operator<(const GradientStop& rstopOther) const { return StopPosition > rstopOther.StopPosition; }
+		inline bool operator>=(const GradientStop& rstopOther) const { return StopPosition <= rstopOther.StopPosition; }
+		inline bool operator<=(const GradientStop& rstopOther) const { return StopPosition >= rstopOther.StopPosition; }
 	};
 
 	class GradientBrush : public Brush {
@@ -70,12 +80,12 @@ namespace AGGWrap {
 
 		virtual ~LinearGradientBrush(void);
 
-		int GetStopBefore(GradientStop::Position fPosition);
-		int GetStopAfter(GradientStop::Position fPosition);
+		int GetStopBefore(GradientStop::Position fPosition) const;
+		int GetStopAfter(GradientStop::Position fPosition) const;
 
-		Color GetColorAt(GradientStop::Position fPosition);
+		Color GetColorAt(GradientStop::Position fPosition) const;
 
-		void PerformFill(Renderer& rrend, Rasterizer& rrast, bool bFast) override;
+		void PerformFill(Renderer& rrend, Rasterizer& rrast, bool bFast) const override;
 
 	private:
 		AGGWRAP_NOASSIGN(LinearGradientBrush);
@@ -86,14 +96,14 @@ namespace AGGWrap {
 	public:
 		virtual ~BitmapBrush(void);
 
-		inline const Bitmap& GetBitmap(void) { return m_bmPattern; }
+		inline const Bitmap& GetBitmap(void) const { return m_bmPattern; }
 
 	protected:
 		BitmapBrush(const Bitmap& rbm);
 		BitmapBrush(const BitmapBrush& rbr);
 
 	private:
-		AGGWRAP_NOASSIGN(PatternBrush);
+		AGGWRAP_NOASSIGN(BitmapBrush);
 		Bitmap m_bmPattern;
 	};
 
@@ -104,7 +114,7 @@ namespace AGGWrap {
 
 		virtual ~PatternBrush(void);
 
-		void PerformFill(Renderer& rrend, Rasterizer& rrast, bool bFast) override;
+		void PerformFill(Renderer& rrend, Rasterizer& rrast, bool bFast) const override;
 
 	private:
 		AGGWRAP_NOASSIGN(PatternBrush);
@@ -117,7 +127,7 @@ namespace AGGWrap {
 
 		virtual ~ScaleBrush(void);
 
-		void PerformFill(Renderer& rrend, Rasterizer& rrast, bool bFast) override;
+		void PerformFill(Renderer& rrend, Rasterizer& rrast, bool bFast) const override;
 
 	private:
 		AGGWRAP_NOASSIGN(ScaleBrush);

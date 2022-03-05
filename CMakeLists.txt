@@ -1,9 +1,17 @@
 cmake_minimum_required (VERSION 3.0)
 
-add_subdirectory (agg)
 include (cmake/inline.cmake)
 
 option (WRAPPER_SHARED "Build aggwrap as shared library" ON)
+option (WRAPPER_STATIC_CRT "Static link C runtime to aggwrap" OFF)
+
+if (WRAPPER_STATIC_CRT)
+	if (MSVC)
+		add_compile_options ($<$<CONFIG:Debug>:/MTd> $<$<NOT:$<CONFIG:Debug>>:/MT>)
+	endif ()
+endif ()
+
+add_subdirectory (agg)
 
 file (GLOB WRAPPER_CPP_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp)
 file (GLOB WRAPPER_C_FILES ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c)

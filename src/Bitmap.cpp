@@ -10,7 +10,8 @@ AGGWrap::Bitmap::Bitmap(int w, int h) {
 	m_nWidth = w;
 	m_nHeight = h;
 
-	m_upData.Steal(UniquePointer<Sample>(new Sample[w * h], s_DeleteSampleArray));
+	UniquePointer<Sample> upData(new Sample[w * h], s_DeleteSampleArray);
+	m_upData.Steal(upData);
 
 	Attach();
 }
@@ -28,7 +29,8 @@ AGGWrap::Bitmap::Bitmap(const Bitmap& rbm) {
 	m_nWidth = rbm.m_nWidth;
 	m_nHeight = rbm.m_nHeight;
 
-	m_upData.Steal(UniquePointer<Sample>(new Sample[rbm.m_nWidth * rbm.m_nHeight], s_DeleteSampleArray));
+	UniquePointer<Sample> upData(new Sample[rbm.m_nWidth * rbm.m_nHeight], s_DeleteSampleArray);
+	m_upData.Steal(upData);
 	memcpy(m_upData.GetPointer(), rbm.m_upData.GetPointer(), GetDataSize());
 
 	Attach();
@@ -51,7 +53,8 @@ AGGWRAP_EXPIMPL AwBitmap_h AGGWRAP_FUNC AwCreateBitmap(int w, int h) {
 
 AGGWRAP_EXPIMPL AwBitmap_h AGGWRAP_FUNC AwCreateBitmapOnBuffer(int w, int h, void* pData, AwDataDestructor_t procDtor) {
 	try {
-		return (AwBitmap_h)new Bitmap(w, h, UniquePointer<Bitmap::Sample>((Bitmap::Sample*)pData, procDtor));
+		UniquePointer<Bitmap::Sample> upData((Bitmap::Sample*)pData, procDtor);
+		return (AwBitmap_h)new Bitmap(w, h, upData);
 	} catch (...) {
 		return nullptr;
 	}

@@ -9,3 +9,9 @@ const char* AGGWrap::OutOfRangeException::GetMessage(void) const {
 }
 
 AGGWrap::OutOfRangeException::~OutOfRangeException(void) {}
+
+const char* AGGWrap::NullPointerException::GetMessage(void) const {
+	return "A pointer that cannot be null was null";
+}
+
+AGGWrap::NullPointerException::~NullPointerException(void) {}

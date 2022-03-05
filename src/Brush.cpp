@@ -27,7 +27,7 @@ AGGWrap::SolidBrush::SolidBrush(const SolidBrush& rbr) {
 
 AGGWrap::SolidBrush::~SolidBrush(void) {}
 
-void AGGWrap::SolidBrush::PerformFill(Renderer& rrend, Rasterizer& rrast, bool bFast) {
+void AGGWrap::SolidBrush::PerformFill(Renderer& rrend, Rasterizer& rrast, bool bFast) const {
 	agg::renderer_scanline_aa_solid<Renderer> rendSolid;
 	agg::scanline_p8 sl;
 
@@ -58,7 +58,7 @@ AGGWrap::LinearGradientBrush::LinearGradientBrush(const LinearGradientBrush& rbr
 
 AGGWrap::LinearGradientBrush::~LinearGradientBrush(void) {}
 
-int AGGWrap::LinearGradientBrush::GetStopBefore(GradientStop::Position fPosition) {
+int AGGWrap::LinearGradientBrush::GetStopBefore(GradientStop::Position fPosition) const {
 	int i;
 
 	for (i = 0; i < GetStopCount(); i++)
@@ -68,7 +68,7 @@ int AGGWrap::LinearGradientBrush::GetStopBefore(GradientStop::Position fPosition
 	return GetStopCount() - 1;
 }
 
-int AGGWrap::LinearGradientBrush::GetStopAfter(GradientStop::Position fPosition) {
+int AGGWrap::LinearGradientBrush::GetStopAfter(GradientStop::Position fPosition) const {
 	int i;
 
 	for (i = 0; i < GetStopCount(); i++)
@@ -78,7 +78,7 @@ int AGGWrap::LinearGradientBrush::GetStopAfter(GradientStop::Position fPosition)
 	return GetStopCount() - 1;
 }
 
-Color AGGWrap::LinearGradientBrush::GetColorAt(GradientStop::Position fPosition) {
+Color AGGWrap::LinearGradientBrush::GetColorAt(GradientStop::Position fPosition) const {
 	int nPrevStop, nNextStop;
 
 	nPrevStop = GetStopBefore(fPosition);
@@ -99,16 +99,16 @@ static void s_GenerateLinearGradient(GradientFunction& rgrad, ColorProvider& rcp
 	agg::scanline_p8 scanline;
 	agg::span_interpolator_linear<agg::trans_affine> interpolator(rxlat);
 	agg::span_gradient<agg::rgba8, agg::span_interpolator_linear<agg::trans_affine>, GradientFunction, ColorProvider>
-		gradient(interpolator, rgradfunc, rcolors, 0.0, d2);
+		gradient(interpolator, rgrad, rcp, 0.0, d2);
 	agg::span_allocator<agg::rgba8> allocator;
 
 	agg::render_scanlines_aa(rrast, scanline, rrend, allocator, gradient);
 }
 
-void AGGWrap::LinearGradientBrush::PerformFill(Renderer& rrend, Rasterizer& rrast, bool bFast) {
+void AGGWrap::LinearGradientBrush::PerformFill(Renderer& rrend, Rasterizer& rrast, bool bFast) const {
 	agg::pod_auto_array<agg::rgba8, 256> arrColors;
 	for (unsigned nColor = 0; nColor < arrColors.size(); nColor++)
-		arrColors[nColor] = GetColorAt(static_cast<double>(nColor) / static_cast<double>(arrColors.size()));
+		arrColors[nColor] = GetColorAt((GradientStop::Position)nColor / (GradientStop::Position)arrColors.size());
 
 	agg::trans_affine xlat;
 	xlat.reset();
@@ -148,7 +148,7 @@ AGGWrap::PatternBrush::~PatternBrush(void) {}
 
 typedef agg::image_accessor_wrap<Bitmap::PixelFormat, agg::wrap_mode_repeat, agg::wrap_mode_repeat> RepeatAccessor;
 
-void AGGWrap::PatternBrush::PerformFill(Renderer& rrend, Rasterizer& rrast, bool bFast) {
+void AGGWrap::PatternBrush::PerformFill(Renderer& rrend, Rasterizer& rrast, bool bFast) const {
 	RepeatAccessor accessor((Bitmap::PixelFormat&)GetBitmap().GetFormatAdaptor());
 	agg::span_pattern_rgba<RepeatAccessor> generator(accessor, 0, 0);
 	agg::span_allocator<agg::rgba8> allocator;
@@ -166,7 +166,7 @@ AGGWrap::ScaleBrush::ScaleBrush(const ScaleBrush& rbr) : BitmapBrush(rbr) {
 
 AGGWrap::ScaleBrush::~ScaleBrush(void) {}
 
-void AGGWrap::ScaleBrush::PerformFill(Renderer& rrend, Rasterizer& rrast, bool bFast) {
+void AGGWrap::ScaleBrush::PerformFill(Renderer& rrend, Rasterizer& rrast, bool bFast) const {
 	int x = rrast.min_x();
 	int y = rrast.min_y();
 	int w = rrast.max_x() - rrast.min_x();
@@ -179,14 +179,21 @@ void AGGWrap::ScaleBrush::PerformFill(Renderer& rrend, Rasterizer& rrast, bool b
 }
 
 AGGWRAP_EXPIMPL AwBrush_h AGGWRAP_FUNC AwCreateSolidBrush(AwByte_t r, AwByte_t g, AwByte_t b, AwByte_t a) {
+	SolidBrush* pBrush;
+
 	try {
-		return (AwBrush_h)new SolidBrush(Color(r, g, b, a));
+		pBrush = new SolidBrush(Color(r, g, b, a));
+		return (AwBrush_h)SharedObject<Brush>::Create(pBrush, 1);
 	} catch (...) {
+		if (pBrush != nullptr)
+			delete pBrush;
 		return nullptr;
 	}
 }
 
 AGGWRAP_EXPIMPL AwBrush_h AGGWRAP_FUNC AwCreateLinearGradientBrush(AwGradientStop_p parrStops, int nStops, AwAngle_t fAngle) {
+	LinearGradientBrush* pBrush;
+
 	try {
 		Array<GradientStop> arrStopsConv(nStops);
 
@@ -195,30 +202,43 @@ AGGWRAP_EXPIMPL AwBrush_h AGGWRAP_FUNC AwCreateLinearGradientBrush(AwGradientSto
 			arrStopsConv[i].StopPosition = parrStops[i].pos;
 		}
 
-		return (AwBrush_h)(Brush*)new LinearGradientBrush(arrStopsConv, fAngle);
+		pBrush = new LinearGradientBrush(arrStopsConv, fAngle);
+		return (AwBrush_h)SharedObject<Brush>::Create(pBrush, 1);
 	} catch (...) {
+		if (pBrush != nullptr)
+			delete pBrush;
 		return nullptr;
 	}
 }
 
 AGGWRAP_EXPIMPL AwBrush_h AGGWRAP_FUNC AwCreatePatternBrush(AwBitmap_h hBitmap) {
+	PatternBrush* pBrush;
+
 	try {
-		return (AwBrush_h)(Brush*)new PatternBrush(*(Bitmap*)hBitmap);
+		pBrush = new PatternBrush(*(Bitmap*)hBitmap);
+		return (AwBrush_h)SharedObject<Brush>::Create(pBrush, 1);
 	} catch (...) {
+		if (pBrush != nullptr)
+			delete pBrush;
 		return nullptr;
 	}
 }
 
 AGGWRAP_EXPIMPL AwBrush_h AGGWRAP_FUNC AwCreateScaledBrush(AwBitmap_h hBitmap, AwScaleMode_t mode) {
+	ScaleBrush* pBrush;
+
 	try {
-		return (AwBrush_h)(Brush*)new ScaleBrush(*(Bitmap*)hBitmap, mode);
+		pBrush = new ScaleBrush(*(Bitmap*)hBitmap, mode);
+		return (AwBrush_h)SharedObject<Brush>::Create(pBrush, 1);
 	} catch (...) {
+		if (pBrush != nullptr)
+			delete pBrush;
 		return nullptr;
 	}
 }
 
 AGGWRAP_EXPIMPL void AGGWRAP_FUNC AwDeleteBrush(AwBrush_h hBrush) {
 	try {
-		delete (Brush*)hBrush;
+		((SharedObject<Brush>*)hBrush)->RemoveRef();
 	} catch (...) { }
 }
