@@ -10,7 +10,7 @@ AGGWrap::Bitmap::Bitmap(int w, int h) {
 	m_nWidth = w;
 	m_nHeight = h;
 
-	UniquePointer<Sample> upData(new Sample[w * h], s_DeleteSampleArray);
+	UniquePointer<Sample> upData(new Sample[w * h * SAMPLES_PER_PIXEL], s_DeleteSampleArray);
 	m_upData.Steal(upData);
 
 	Attach();
@@ -29,7 +29,7 @@ AGGWrap::Bitmap::Bitmap(const Bitmap& rbm) {
 	m_nWidth = rbm.m_nWidth;
 	m_nHeight = rbm.m_nHeight;
 
-	UniquePointer<Sample> upData(new Sample[rbm.m_nWidth * rbm.m_nHeight], s_DeleteSampleArray);
+	UniquePointer<Sample> upData(new Sample[rbm.m_nWidth * rbm.m_nHeight * SAMPLES_PER_PIXEL], s_DeleteSampleArray);
 	m_upData.Steal(upData);
 	memcpy(m_upData.GetPointer(), rbm.m_upData.GetPointer(), GetDataSize());
 
