@@ -15,3 +15,9 @@ const char* AGGWrap::NullPointerException::GetMessage(void) const {
 }
 
 AGGWrap::NullPointerException::~NullPointerException(void) {}
+
+const char* AGGWrap::InvalidOperationException::GetMessage(void) const {
+	return "The requested operation cannot be performed while the object is in this state";
+}
+
+AGGWrap::InvalidOperationException::~InvalidOperationException(void) {}

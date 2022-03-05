@@ -24,59 +24,16 @@
 #define AGGWRAP_EXPIMPL extern "C"
 
 namespace AGGWrap {
-	template<typename T>
-	class UniquePointer {
+	class Exception {
 	public:
-		constexpr inline UniquePointer(void) {
-			m_pData = (T*)nullptr;
-			m_procDtor = (AwDataDestructor_t)nullptr;
-		}
-		
-		inline UniquePointer(UniquePointer<T>& rupSteal) {
-			m_pData = rupSteal.m_pData;
-			m_procDtor = rupSteal.m_procDtor;
-			rupSteal.m_pData = nullptr;
-			rupSteal.m_procDtor = nullptr;
-		}
+		virtual const char* GetMessage(void) const = 0;
+		virtual ~Exception(void);
+	};
 
-		constexpr inline UniquePointer(T* pData, AwDataDestructor_t procDtor) {
-			m_pData = pData;
-			m_procDtor = procDtor;
-		}
-
-		inline void Steal(UniquePointer<T>& rupStealFrom) {
-			if (&rupStealFrom != this) {
-				m_pData = rupStealFrom.m_pData;
-				m_procDtor = rupStealFrom.m_procDtor;
-				rupStealFrom.m_pData = (T*)nullptr;
-				rupStealFrom.m_procDtor = (AwDataDestructor_t)nullptr;
-			}
-		}
-
-		inline ~UniquePointer(void) {
-			T* pData = m_pData;
-			AwDataDestructor_t procDtor = m_procDtor;
-
-			m_pData = (T*)nullptr; 
-			m_procDtor = (AwDataDestructor_t)nullptr;
-
-			if (procDtor)
-				procDtor((void*)pData);
-		}
-
-		inline T* operator->(void) { return m_pData; }
-		inline const T* operator->(void) const { return m_pData; }
-		inline T& operator*(void) { return *m_pData; }
-		inline const T& operator*(void) const { return *m_pData; }
-
-		inline T* GetPointer(void) { return m_pData; }
-		inline const T* GetPointer(void) const { return m_pData; }
-
-	private:
-		AGGWRAP_NOASSIGN(UniquePointer<T>);
-
-		T* m_pData;
-		AwDataDestructor_t m_procDtor;
+	class InvalidOperationException : public Exception {
+	public:
+		const char* GetMessage(void) const override;
+		virtual ~InvalidOperationException(void);
 	};
 
 	template<typename T>
@@ -86,12 +43,6 @@ namespace AGGWrap {
 	void AGGWRAP_FUNC DeleteArray(T* parrObjects) { delete[] parrObjects; }
 
 	typedef agg::rgba8 Color;
-
-	class Exception {
-	public:
-		virtual const char* GetMessage(void) const = 0;
-		virtual ~Exception(void);
-	};
 
 	class OutOfRangeException : Exception {
 	public:
