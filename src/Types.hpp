@@ -44,6 +44,16 @@ namespace AGGWrap {
 
 	typedef agg::rgba8 Color;
 
+	inline Color Premultiply(Color clrOrig) {
+		register unsigned r = clrOrig.r;
+		register unsigned g = clrOrig.g;
+		register unsigned b = clrOrig.b;
+		register unsigned a = clrOrig.a;
+		r *= a; g *= a; b *= a;
+		r >>= 8; g >>= 8; b >>= 8;
+		return Color(r, g, b, a);
+	}
+
 	class OutOfRangeException : Exception {
 	public:
 		const char* GetMessage(void) const override;

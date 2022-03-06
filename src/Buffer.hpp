@@ -52,7 +52,7 @@ namespace AGGWrap {
 			return GetArrayPointer()[nItem]; 
 		}
 
-		inline int GetItemCount(void) const { return GetInfo().nDataSize / sizeof(T); }
+		inline int GetItemCount(void) const { return (int)(GetInfo().nDataSize / sizeof(T)); }
 
 	private:
 		AGGWRAP_NOCOPY(BufferOf, BufferOf<T>);

@@ -19,10 +19,12 @@ AGGWrap::SolidBrush::SolidBrush(void) {
 
 AGGWrap::SolidBrush::SolidBrush(Color clr) {
 	m_clr = clr;
+	m_clrPremul = Premultiply(clr);
 }
 
 AGGWrap::SolidBrush::SolidBrush(const SolidBrush& rbr) {
 	m_clr = rbr.m_clr;
+	m_clrPremul = rbr.m_clrPremul;
 }
 
 AGGWrap::SolidBrush::~SolidBrush(void) {}
@@ -32,7 +34,7 @@ void AGGWrap::SolidBrush::PerformFill(Renderer& rrend, Rasterizer& rrast, bool b
 	agg::scanline_p8 sl;
 
 	rendSolid.attach(rrend);
-	rendSolid.color(m_clr);
+	rendSolid.color(m_clrPremul);
 
 	agg::render_scanlines(rrast, sl, rendSolid);
 }

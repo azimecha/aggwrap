@@ -89,3 +89,11 @@ AGGWRAP_EXPIMPL void AGGWRAP_FUNC AwDeleteBitmap(AwBitmap_h hBitmap) {
 		delete (Bitmap*)hBitmap;
 	} catch (...) { }
 }
+
+AGGWRAP_EXPIMPL void* AGGWRAP_FUNC AwAccessBitmapData(AwBitmap_h hBitmap) {
+	try {
+		return (void*)((Bitmap*)hBitmap)->GetDataPointer();
+	} catch (...) {
+		return nullptr;
+	}
+}

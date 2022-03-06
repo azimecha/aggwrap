@@ -41,7 +41,7 @@ namespace AGGWrap {
 
 	private:
 		AGGWRAP_NOASSIGN(SolidBrush);
-		Color m_clr;
+		Color m_clr, m_clrPremul;
 	};
 
 	struct GradientStop {

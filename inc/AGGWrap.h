@@ -22,6 +22,7 @@ typedef float AwPathCoord_t;
 typedef float AwGradientPos_t;
 typedef float AwThickness_t;
 typedef int AwGenCoord_t;
+typedef unsigned long long AwDataSize_t;
 
 typedef AwByte_t* AwByte_p;
 typedef AwBool_t* AwBool_p;
@@ -41,7 +42,7 @@ typedef void (AGGWRAP_FUNC* AwBufferDestructor_t)(void* pData, void* tag);
 
 typedef struct AwBufferInfo_s {
 	void* pData;
-	unsigned long nDataSize;
+	AwDataSize_t nDataSize;
 	AwBufferDestructor_t procDestructor;
 	void* tag;
 } AwBufferInfo_t, *AwBufferInfo_p;
@@ -92,6 +93,7 @@ AGGWRAP_EXPORTED AwBitmap_h AGGWRAP_FUNC AwCreateBitmap(int w, int h);
 AGGWRAP_EXPORTED AwBitmap_h AGGWRAP_FUNC AwCreateBitmapOnBuffer(int w, int h, AwBufferInfo_p pinfBuffer);
 AGGWRAP_EXPORTED AwBool_t AGGWRAP_FUNC AwGetBitmapSize(AwBitmap_h hBitmap, AGGWRAP_OUT int* pnWidth, AGGWRAP_OUT int* pnHeight);
 AGGWRAP_EXPORTED AwBool_t AGGWRAP_FUNC AwGetBitmapDataSize(AwBitmap_h hBitmap, AGGWRAP_OPTIONAL AGGWRAP_OUT int* pnStride, AGGWRAP_OPTIONAL AGGWRAP_OUT int* pnFullSize);
+AGGWRAP_EXPORTED void* AGGWRAP_FUNC AwAccessBitmapData(AwBitmap_h hBitmap);
 AGGWRAP_EXPORTED AwBitmap_h AGGWRAP_FUNC AwDuplicateBitmap(AwBitmap_h hBitmap);
 AGGWRAP_EXPORTED void AGGWRAP_FUNC AwDeleteBitmap(AwBitmap_h hBitmap);
 
