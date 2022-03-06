@@ -21,3 +21,9 @@ const char* AGGWrap::InvalidOperationException::GetMessage(void) const {
 }
 
 AGGWrap::InvalidOperationException::~InvalidOperationException(void) {}
+
+const char* AGGWrap::InvalidEnumValueException::GetMessage(void) const {
+	return "The given value is not valid for this enum";
+}
+
+AGGWrap::InvalidEnumValueException::~InvalidEnumValueException(void) {}

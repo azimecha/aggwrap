@@ -159,6 +159,8 @@ namespace AGGWrap {
 
 		agg::render_scanlines_aa(rrast, sl, rrend, allocator, generator);
 	}
+
+	void CalculateScaledRect(int nSourceW, int nSourceH, int& rnDestX, int& rnDestY, int& rnDestW, int& rnDestH, AwScaleMode_t mode);
 }
 
 #endif

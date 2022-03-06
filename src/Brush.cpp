@@ -174,6 +174,8 @@ void AGGWrap::ScaleBrush::PerformFill(Renderer& rrend, Rasterizer& rrast, bool b
 	int w = rrast.max_x() - rrast.min_x();
 	int h = rrast.max_y() - rrast.min_y();
 
+	CalculateScaledRect(GetBitmap().GetWidth(), GetBitmap().GetHeight(), x, y, w, h, m_mode);
+
 	if (bFast)
 		ScaledBitmapFill<agg::span_image_filter_rgba_nn<ClipAccessor, LinearSpanInterpolator>>(GetBitmap(), rrend, rrast, x, y, w, h);
 	else
@@ -243,4 +245,48 @@ AGGWRAP_EXPIMPL void AGGWRAP_FUNC AwDeleteBrush(AwBrush_h hBrush) {
 	try {
 		((SharedObject<Brush>*)hBrush)->RemoveRef();
 	} catch (...) { }
+}
+
+void AGGWrap::CalculateScaledRect(int nSourceW, int nSourceH, int& rnDestX, int& rnDestY, int& rnDestW, int& rnDestH, AwScaleMode_t mode) {
+	float fRatioX, fRatioY, fRatioChosen;
+	int nScaledW, nScaledH, nCenterX, nCenterY;
+
+	if ((rnDestW == 0) || (rnDestH == 0))
+		return;
+
+	fRatioX = nSourceW / rnDestW;
+	fRatioY = nSourceH / rnDestH;
+
+	switch (mode) {
+	case AwScaleMode_OriginalSize:
+		rnDestW = nSourceW;
+		rnDestH = nSourceH;
+		return;
+
+	case AwScaleMode_Fill:
+		fRatioChosen = (fRatioX < fRatioY) ? fRatioX : fRatioY;
+		break;
+
+	case AwScaleMode_Fit:
+		fRatioChosen = (fRatioX > fRatioY) ? fRatioX : fRatioY;
+		break;
+
+	case AwScaleMode_Stretch:
+		return;
+
+	default:
+		throw new InvalidEnumValueException();
+	}
+
+	nScaledW = nSourceW / fRatioChosen;
+	nScaledH = nSourceH / fRatioChosen;
+
+	nCenterX = rnDestX + rnDestW / 2;
+	nCenterY = rnDestY + rnDestH / 2;
+
+	rnDestX = nCenterX - nScaledW / 2;
+	rnDestY = nCenterY - nScaledH / 2;
+	
+	rnDestW = nScaledW;
+	rnDestH = nScaledH;	
 }

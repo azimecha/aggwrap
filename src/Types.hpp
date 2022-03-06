@@ -36,6 +36,12 @@ namespace AGGWrap {
 		virtual ~InvalidOperationException(void);
 	};
 
+	class InvalidEnumValueException : public Exception {
+	public:
+		const char* GetMessage(void) const override;
+		virtual ~InvalidEnumValueException(void);
+	};
+
 	template<typename T>
 	void AGGWRAP_FUNC DeleteSingleObject(T* pObject) { delete pObject; }
 
