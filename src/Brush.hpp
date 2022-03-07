@@ -139,7 +139,7 @@ namespace AGGWrap {
 
 	template<typename ScalingFilter>
 	void ScaledBitmapFill(const Bitmap& rbm, Brush::Renderer& rrend, Brush::Rasterizer& rrast, int nDestX, int nDestY, int nDestW, int nDestH,
-		int nSrcX = 0, int nSrcY = 0, int nSrcW = -1, int nSrcH = -1)
+		int nSrcX = 0, int nSrcY = 0, int nSrcW = -1, int nSrcH = -1, bool bScanlineAA = true)
 	{
 		agg::scanline_p8 sl;
 
@@ -157,7 +157,10 @@ namespace AGGWrap {
 		ScalingFilter generator(accessor, interpolator);
 		agg::span_allocator<Bitmap::PixelFormat::color_type> allocator;
 
-		agg::render_scanlines_aa(rrast, sl, rrend, allocator, generator);
+		if (bScanlineAA)
+			agg::render_scanlines_aa(rrast, sl, rrend, allocator, generator);
+		else
+			agg::render_scanlines_bin(rrast, sl, rrend, allocator, generator);
 	}
 
 	void CalculateScaledRect(int nSourceW, int nSourceH, int& rnDestX, int& rnDestY, int& rnDestW, int& rnDestH, AwScaleMode_t mode);

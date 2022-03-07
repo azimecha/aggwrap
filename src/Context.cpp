@@ -46,6 +46,38 @@ void AGGWrap::DrawingContext::DrawLine(const Pen& rpen, AwGenCoord_t x1, AwGenCo
 	DrawPath(rpen, pathLine);
 }
 
+void AGGWrap::DrawingContext::Blit(const Bitmap& rbmSource, AwGenCoord_t nSourceX, AwGenCoord_t nSourceY, AwGenCoord_t nSourceW, 
+	AwGenCoord_t nSourceH, AwGenCoord_t nDestX, AwGenCoord_t nDestY, AwGenCoord_t nDestW, AwGenCoord_t nDestH)
+{
+	if (&rbmSource == &m_rbmTarget) {
+		Bitmap bmTemp(rbmSource);
+		Blit(bmTemp, nSourceX, nSourceY, nSourceW, nSourceH, nDestX, nDestY, nDestW, nDestH);
+		return;
+	}
+
+	agg::path_storage ps;
+	ps.move_to(nDestX, nDestY);
+	ps.hline_rel(nDestW);
+	ps.vline_rel(nDestH);
+	ps.hline_to(nDestX);
+	ps.vline_to(nDestY);
+	ps.close_polygon();
+
+	agg::rasterizer_scanline_aa<> rast;
+	rast.reset();
+	rast.add_path(ps);
+
+	agg::renderer_base<Bitmap::PixelFormat> rend(m_rbmTarget.GetFormatAdaptor());
+	agg::scanline_p8 sl;
+	
+	if (m_bFast)
+		ScaledBitmapFill<agg::span_image_filter_rgba_nn<ClipAccessor, LinearSpanInterpolator>>(rbmSource, rend, rast, nDestX, nDestY,
+			nDestW, nDestH, nSourceX, nSourceY, nSourceW, nSourceH, false);
+	else
+		ScaledBitmapFill<agg::span_image_filter_rgba_bilinear<ClipAccessor, LinearSpanInterpolator>>(rbmSource, rend, rast, nDestX, nDestY,
+			nDestW, nDestH, nSourceX, nSourceY, nSourceW, nSourceH, false);
+}
+
 AGGWRAP_EXPIMPL AwContext_h AGGWRAP_FUNC AwCreateContextOnBitmap(AwBitmap_h hBitmap) {
 	try {
 		return (AwContext_h)new DrawingContext(*(AGGWrap::Bitmap*)hBitmap);
@@ -121,4 +153,15 @@ AGGWRAP_EXPIMPL void AGGWRAP_FUNC AwDeleteContext(AwContext_h hContext) {
 	try {
 		delete (DrawingContext*)hContext;
 	} catch (...) { }
+}
+
+AGGWRAP_EXPIMPL AwBool_t AGGWRAP_FUNC AwBlitImage(AwContext_h hDestContext, AwBitmap_h hSrcBitmap, AwGenCoord_t nSourceX, AwGenCoord_t nSourceY,
+	AwGenCoord_t nSourceW, AwGenCoord_t nSourceH, AwGenCoord_t nDestX, AwGenCoord_t nDestY, AwGenCoord_t nDestW, AwGenCoord_t nDestH)
+{
+	try {
+		((DrawingContext*)hDestContext)->Blit(*(Bitmap*)hSrcBitmap, nSourceX, nSourceY, nSourceW, nSourceH, nDestX, nDestY, nDestW, nDestH);
+		return AGGWRAP_TRUE;
+	} catch (...) {
+		return AGGWRAP_FALSE;
+	}
 }

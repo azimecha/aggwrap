@@ -21,6 +21,9 @@ namespace AGGWrap {
 		void DrawRectangle(const Pen& rpen, AwGenCoord_t x, AwGenCoord_t y, AwGenCoord_t w, AwGenCoord_t h);
 		void DrawLine(const Pen& rpen, AwGenCoord_t x1, AwGenCoord_t y1, AwGenCoord_t x2, AwGenCoord_t y2);
 
+		void Blit(const Bitmap& rbmSource, AwGenCoord_t nSourceX, AwGenCoord_t nSourceY, AwGenCoord_t nSourceW, AwGenCoord_t nSourceH,
+			AwGenCoord_t nDestX, AwGenCoord_t nDestY, AwGenCoord_t nDestW, AwGenCoord_t nDestH);
+
 		inline void EnableFastMode(bool bFast) { m_bFast = bFast; }
 
 	private:

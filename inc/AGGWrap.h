@@ -139,6 +139,8 @@ AGGWRAP_EXPORTED AwBool_t AGGWRAP_FUNC AwFillRectangle(AwContext_h hContext, AwB
 AGGWRAP_EXPORTED AwBool_t AGGWRAP_FUNC AwDrawPath(AwContext_h hContext, AwPen_h hPen, AwPath_h hPath);
 AGGWRAP_EXPORTED AwBool_t AGGWRAP_FUNC AwDrawRectangle(AwContext_h hContext, AwPen_h hPen, AwGenCoord_t x, AwGenCoord_t y, AwGenCoord_t w, AwGenCoord_t h);
 AGGWRAP_EXPORTED AwBool_t AGGWRAP_FUNC AwDrawLine(AwContext_h hContext, AwPen_h hPen, AwGenCoord_t x1, AwGenCoord_t y1, AwGenCoord_t x2, AwGenCoord_t y2);
+AGGWRAP_EXPORTED AwBool_t AGGWRAP_FUNC AwBlitImage(AwContext_h hDestContext, AwBitmap_h hSrcBitmap, AwGenCoord_t nSourceX, AwGenCoord_t nSourceY, 
+	AwGenCoord_t nSourceW, AwGenCoord_t nSourceH, AwGenCoord_t nDestX, AwGenCoord_t nDestY, AwGenCoord_t nDestW, AwGenCoord_t nDestH);
 AGGWRAP_EXPORTED void AGGWRAP_FUNC AwDeleteContext(AwContext_h hContext);
 
 #endif
