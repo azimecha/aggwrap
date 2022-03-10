@@ -82,14 +82,14 @@ namespace AGGWrap {
 		Array(const Array<T>& rarr) {
 			m_parrItems = new T[rarr.m_nItems];
 			m_nItems = rarr.m_nItems;
-			memcpy((void*)m_parrItems, (const void*)rarr.m_parrItems, rarr.m_nItems);
+			memcpy((void*)m_parrItems, (const void*)rarr.m_parrItems, rarr.m_nItems * sizeof(T));
 		}
 
 		Array<T>& operator=(const Array<T>& rarr) {
 			if (&rarr != this) {
 				m_parrItems = new T[rarr.m_nItems];
 				m_nItems = rarr.m_nItems;
-				memcpy((void*)m_parrItems, (const void*)rarr.m_parrItems, rarr.m_nItems);
+				memcpy((void*)m_parrItems, (const void*)rarr.m_parrItems, rarr.m_nItems * sizeof(T));
 			}
 			return *this;
 		}
@@ -205,6 +205,34 @@ namespace AGGWrap {
 
 		T* m_pObject;
 		int m_nRefCount;
+	};
+
+	template<typename T>
+	class SharedObjectReference {
+	public:
+		inline SharedObjectReference(SharedObject<T>& robj) : m_robj(robj) {
+			robj.AddRef();
+			m_bReleased = false;
+		}
+
+		inline ~SharedObjectReference(void) { 
+			if (!m_bReleased)
+				m_robj.RemoveRef();
+		}
+
+		void Release(void) {
+			if (m_bReleased)
+				throw new InvalidOperationException();
+			m_robj.RemoveRef();
+			m_bReleased = true;
+		}
+
+	private:
+		AGGWRAP_NOCOPY(SharedObjectReference, SharedObjectReference<T>);
+		AGGWRAP_NOASSIGN(SharedObjectReference<T>);
+
+		SharedObject<T>& m_robj;
+		bool m_bReleased;
 	};
 }
 

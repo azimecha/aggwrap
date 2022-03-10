@@ -7,6 +7,7 @@
 #include "Brush.hpp"
 #include "Path.hpp"
 #include "Pen.hpp"
+#include "Font.hpp"
 
 namespace AGGWrap {
 	class DrawingContext {
@@ -16,6 +17,8 @@ namespace AGGWrap {
 		void FillAll(const Brush& rbrush);
 		void FillPath(const Brush& rbrush, const Path& rpath);
 		void FillRectangle(const Brush& rbrush, AwGenCoord_t x, AwGenCoord_t y, AwGenCoord_t w, AwGenCoord_t h);
+		void FillText(const Brush& rbrush, const Font& rfont, AwPathCoord_t x, AwPathCoord_t y, const Array<Codepoint>& rarrCodepoints);
+		void FillText(const Brush& rbrush, const Font& rfont, AwPathCoord_t x, AwPathCoord_t y, const char* pcszText);
 		
 		void DrawPath(const Pen& rpen, const Path& rpath);
 		void DrawRectangle(const Pen& rpen, AwGenCoord_t x, AwGenCoord_t y, AwGenCoord_t w, AwGenCoord_t h);

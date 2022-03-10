@@ -94,9 +94,9 @@ Color AGGWrap::LinearGradientBrush::GetColorAt(GradientStop::Position fPosition)
 	}
 }
 
-template<typename GradientFunction, typename ColorProvider>
+template<typename GradientFunction, typename ColorProvider, typename Rasterizer>
 static void s_GenerateLinearGradient(GradientFunction& rgrad, ColorProvider& rcp, double d2, agg::trans_affine& rxlat,
-	agg::renderer_base<Bitmap::PixelFormat>& rrend, agg::rasterizer_scanline_aa<>& rrast)
+	agg::renderer_base<Bitmap::PixelFormat>& rrend, Rasterizer& rrast)
 {
 	agg::scanline_p8 scanline;
 	agg::span_interpolator_linear<agg::trans_affine> interpolator(rxlat);

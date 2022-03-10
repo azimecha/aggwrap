@@ -2,3 +2,7 @@
 	path = stb
 	url = https://github.com/nothings/stb.git
 	branch = master
+[submodule "utf8"]
+	path = utf8
+	url = https://github.com/sheredom/utf8.h.git
+	branch = master

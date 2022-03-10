@@ -16,13 +16,23 @@ void AGGWrap::DrawingContext::FillPath(const Brush& rbrush, const Path& rpath) {
 
 	agg::path_storage storTemp(rpath.GetStorage());
 	rast.add_path(storTemp);
-	rbrush.PerformFill(rend, rast, m_bFast);
+	rbrush.PerformFill(rend, Rasterizer<agg::rasterizer_scanline_aa<>>(rast), m_bFast);
 }
 
 void AGGWrap::DrawingContext::FillRectangle(const Brush& rbrush, AwGenCoord_t x, AwGenCoord_t y, AwGenCoord_t w, AwGenCoord_t h) {
 	Path pathRect;
 	pathRect.AddRectangle(x, y, w, h);
 	FillPath(rbrush, pathRect);
+}
+
+void AGGWrap::DrawingContext::FillText(const Brush& rbrush, const Font& rfont, AwPathCoord_t x, AwPathCoord_t y, const Array<Codepoint>& rarrCodepoints) {
+	agg::renderer_base<Bitmap::PixelFormat> rend(m_rbmTarget.GetFormatAdaptor());
+	rfont.DrawText(rend, rbrush, x, y, rarrCodepoints, m_bFast);
+}
+
+void AGGWrap::DrawingContext::FillText(const Brush& rbrush, const Font& rfont, AwPathCoord_t x, AwPathCoord_t y, const char* pcszText) {
+	Array<Codepoint> arrCodepoints = ParseUTF8(pcszText);
+	FillText(rbrush, rfont, x, y, arrCodepoints);
 }
 
 void AGGWrap::DrawingContext::DrawPath(const Pen& rpen, const Path& rpath) {
@@ -69,12 +79,14 @@ void AGGWrap::DrawingContext::Blit(const Bitmap& rbmSource, AwGenCoord_t nSource
 
 	agg::renderer_base<Bitmap::PixelFormat> rend(m_rbmTarget.GetFormatAdaptor());
 	agg::scanline_p8 sl;
+
+	Rasterizer<agg::rasterizer_scanline_aa<>> rastWrapper(rast);
 	
 	if (m_bFast)
-		ScaledBitmapFill<agg::span_image_filter_rgba_nn<ClipAccessor, LinearSpanInterpolator>>(rbmSource, rend, rast, nDestX, nDestY,
+		ScaledBitmapFill<agg::span_image_filter_rgba_nn<ClipAccessor, LinearSpanInterpolator>>(rbmSource, rend, rastWrapper, nDestX, nDestY,
 			nDestW, nDestH, nSourceX, nSourceY, nSourceW, nSourceH, false);
 	else
-		ScaledBitmapFill<agg::span_image_filter_rgba_bilinear<ClipAccessor, LinearSpanInterpolator>>(rbmSource, rend, rast, nDestX, nDestY,
+		ScaledBitmapFill<agg::span_image_filter_rgba_bilinear<ClipAccessor, LinearSpanInterpolator>>(rbmSource, rend, rastWrapper, nDestX, nDestY,
 			nDestW, nDestH, nSourceX, nSourceY, nSourceW, nSourceH, false);
 }
 
@@ -116,6 +128,15 @@ AGGWRAP_EXPIMPL AwBool_t AGGWRAP_FUNC AwFillPath(AwContext_h hContext, AwBrush_h
 AGGWRAP_EXPIMPL AwBool_t AGGWRAP_FUNC AwFillRectangle(AwContext_h hContext, AwBrush_h hBrush, AwGenCoord_t x, AwGenCoord_t y, AwGenCoord_t w, AwGenCoord_t h) {
 	try {
 		((DrawingContext*)hContext)->FillRectangle(Brush::FromHandle(hBrush), x, y, w, h);
+		return AGGWRAP_TRUE;
+	} catch (...) {
+		return AGGWRAP_FALSE;
+	}
+}
+
+AGGWRAP_EXPIMPL AwBool_t AGGWRAP_FUNC AwFillText(AwContext_h hContext, AwBrush_h hBrush, AwFont_h hFont, AwPathCoord_t x, AwPathCoord_t y, const char* pcszText) {
+	try {
+		((DrawingContext*)hContext)->FillText(Brush::FromHandle(hBrush), *(Font*)hFont, x, y, pcszText);
 		return AGGWRAP_TRUE;
 	} catch (...) {
 		return AGGWRAP_FALSE;

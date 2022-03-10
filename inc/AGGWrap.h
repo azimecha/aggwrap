@@ -83,11 +83,29 @@ typedef enum AwQuality_e {
 
 typedef const struct AwPenParams_s* AwPenParams_pc;
 
+typedef short AwBitmapFontSize_t;
+
+typedef struct AwBitmapFontGlyph_s {
+	AwBitmapFontSize_t nWidthPixels;
+	AwByte_t* pData;
+} AwBitmapFontGlyph_t, *AwBitmapFontGlyph_p;
+
+typedef struct AwFontInfo_s {
+	AwBitmapFontSize_t nHeight;
+	AwPathCoord_t fAscent;
+	AwPathCoord_t fInternalLeading;
+	AwPathCoord_t fExternalLeading;
+} AwFontInfo_t, *AwFontInfo_p;
+
+typedef const struct AwBitmapFontGlyph_s* AwBitmapFontGlyph_pc;
+typedef const struct AwFontInfo_s* AwFontInfo_pc;
+
 typedef void* AwBitmap_h;
 typedef void* AwBrush_h;
 typedef void* AwPath_h;
 typedef void* AwPen_h;
 typedef void* AwContext_h;
+typedef void* AwFont_h;
 
 AGGWRAP_EXPORTED AwBitmap_h AGGWRAP_FUNC AwCreateBitmap(int w, int h);
 AGGWRAP_EXPORTED AwBitmap_h AGGWRAP_FUNC AwCreateBitmapOnBuffer(int w, int h, AwBufferInfo_p pinfBuffer);
@@ -136,11 +154,20 @@ AGGWRAP_EXPORTED AwBool_t AGGWRAP_FUNC AwSetDrawQuality(AwContext_h hContext, Aw
 AGGWRAP_EXPORTED AwBool_t AGGWRAP_FUNC AwFillContext(AwContext_h hContext, AwBrush_h hBrush);
 AGGWRAP_EXPORTED AwBool_t AGGWRAP_FUNC AwFillPath(AwContext_h hContext, AwBrush_h hBrush, AwPath_h hPath);
 AGGWRAP_EXPORTED AwBool_t AGGWRAP_FUNC AwFillRectangle(AwContext_h hContext, AwBrush_h hBrush, AwGenCoord_t x, AwGenCoord_t y, AwGenCoord_t w, AwGenCoord_t h);
+AGGWRAP_EXPORTED AwBool_t AGGWRAP_FUNC AwFillText(AwContext_h hContext, AwBrush_h hBrush, AwFont_h hFont, AwPathCoord_t x, AwPathCoord_t y,
+	const char* pcszText);
 AGGWRAP_EXPORTED AwBool_t AGGWRAP_FUNC AwDrawPath(AwContext_h hContext, AwPen_h hPen, AwPath_h hPath);
 AGGWRAP_EXPORTED AwBool_t AGGWRAP_FUNC AwDrawRectangle(AwContext_h hContext, AwPen_h hPen, AwGenCoord_t x, AwGenCoord_t y, AwGenCoord_t w, AwGenCoord_t h);
 AGGWRAP_EXPORTED AwBool_t AGGWRAP_FUNC AwDrawLine(AwContext_h hContext, AwPen_h hPen, AwGenCoord_t x1, AwGenCoord_t y1, AwGenCoord_t x2, AwGenCoord_t y2);
 AGGWRAP_EXPORTED AwBool_t AGGWRAP_FUNC AwBlitImage(AwContext_h hDestContext, AwBitmap_h hSrcBitmap, AwGenCoord_t nSourceX, AwGenCoord_t nSourceY, 
 	AwGenCoord_t nSourceW, AwGenCoord_t nSourceH, AwGenCoord_t nDestX, AwGenCoord_t nDestY, AwGenCoord_t nDestW, AwGenCoord_t nDestH);
 AGGWRAP_EXPORTED void AGGWRAP_FUNC AwDeleteContext(AwContext_h hContext);
+
+AGGWRAP_EXPORTED AwFont_h AGGWRAP_FUNC AwCreateMonochromeBitmapFont(AwFontInfo_pc pcinfFont, AwBufferInfo_p pinfGlyphBuffer, int nGlyphZeroChar, int nGlyphCount,
+	int nGlyphDefault); // pinfGlyphBuffer is AwBitmapFontGlyph_t buffer
+AGGWRAP_EXPORTED AwBool_t AGGWRAP_FUNC AwGetTextSize(AwFont_h hFont, const char* pcszText, AGGWRAP_OPTIONAL AGGWRAP_OUT AwPathCoord_p pfWidth, 
+	AGGWRAP_OPTIONAL AGGWRAP_OUT AwPathCoord_p pfHeight);
+AGGWRAP_EXPORTED AwBool_t AGGWRAP_FUNC AwGetFontInfo(AwFont_h hFont, AGGWRAP_OUT AwFontInfo_p pinfFont);
+AGGWRAP_EXPORTED void AGGWRAP_FUNC AwDeleteFont(AwFont_h hFont);
 
 #endif

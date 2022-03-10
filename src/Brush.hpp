@@ -14,10 +14,38 @@
 #include <agg_renderer_scanline.h>
 
 namespace AGGWrap {
+	class IRasterizer {
+	public:
+		typedef agg::scanline_p8 Scanline;
+		
+		virtual bool rewind_scanlines(void) = 0;
+		virtual int min_x(void) const = 0;
+		virtual int max_x(void) const = 0;
+		virtual int min_y(void) const = 0;
+		virtual int max_y(void) const = 0;
+		virtual bool sweep_scanline(Scanline& sl) = 0;
+	};
+
+	template<typename InnerRasterizer>
+	class Rasterizer : public IRasterizer {
+	private:
+		InnerRasterizer& m_rrast;
+
+	public:
+		Rasterizer(InnerRasterizer& rrast) : m_rrast(rrast) {}
+
+		bool rewind_scanlines(void) override { return m_rrast.rewind_scanlines(); }
+		int min_x(void) const override { return m_rrast.min_x(); }
+		int max_x(void) const override { return m_rrast.max_x(); }
+		int min_y(void) const override { return m_rrast.min_y(); }
+		int max_y(void) const override { return m_rrast.max_y(); }
+		bool sweep_scanline(Scanline& sl) override { return m_rrast.sweep_scanline(sl); }
+	};
+
 	class Brush {
 	public:
 		typedef agg::renderer_base<Bitmap::PixelFormat> Renderer;
-		typedef agg::rasterizer_scanline_aa<> Rasterizer;
+		typedef AGGWrap::IRasterizer Rasterizer;
 
 		virtual ~Brush(void);
 		virtual void PerformFill(Renderer& rrend, Rasterizer& rrast, bool bFast) const = 0;
