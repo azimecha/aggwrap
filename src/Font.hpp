@@ -6,13 +6,15 @@
 #include "Types.hpp"
 #include "Brush.hpp"
 
+#define AGGWRAP_TAB_SIZE 4
+
 namespace AGGWrap {
 	typedef int Codepoint;
 
 	class Font {
 	public:
 		virtual ~Font(void);
-		virtual AwPathCoord_t CalculateSize(const Array<Codepoint>& rarrCodepoints) const = 0;
+		virtual AwPathPoint_t CalculateSize(const Array<Codepoint>& rarrCodepoints) const = 0;
 		virtual void DrawText(Brush::Renderer& rrend, const Brush& rbr, AwPathCoord_t x, AwPathCoord_t y, const Array<Codepoint>& rarrCodepoints,
 			bool bFast) const = 0;
 
@@ -33,7 +35,7 @@ namespace AGGWrap {
 	public:
 		virtual ~BitmapFont(void);
 
-		AwPathCoord_t CalculateSize(const Array<Codepoint>& rarrCodepoints) const override;
+		AwPathPoint_t CalculateSize(const Array<Codepoint>& rarrCodepoints) const override;
 
 	private:
 		AGGWRAP_NOCOPY(BitmapFont, BitmapFont);
@@ -56,6 +58,10 @@ namespace AGGWrap {
 
 		inline const AwBitmapFontGlyph_t& GetGlyph(Codepoint nCodepoint) const {
 			return m_bufGlyphs[GetGlyphIndex(nCodepoint)];
+		}
+
+		inline AwPathCoord_t GetTabSize(void) const {
+			return AGGWRAP_TAB_SIZE * GetGlyph(' ').nWidthPixels;
 		}
 	};
 

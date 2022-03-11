@@ -38,13 +38,42 @@ AGGWrap::BitmapFont::BitmapFont(BufferOf<AwBitmapFontGlyph_t>& rbufGlyphs, const
 
 AGGWrap::BitmapFont::~BitmapFont(void) {}
 
-AwPathCoord_t AGGWrap::BitmapFont::CalculateSize(const Array<Codepoint>& rarrCodepoints) const {
-	AwPathCoord_t fLength = 0.0f;
+AwPathPoint_t AGGWrap::BitmapFont::CalculateSize(const Array<Codepoint>& rarrCodepoints) const {
+	int nLineHeight = GetInfo().nHeight;
 
-	for (int i = 0; i < rarrCodepoints.GetItemCount(); i++)
-		fLength += GetGlyph(rarrCodepoints[i]).nWidthPixels;
+	AwPathPoint_t ptExtent;
+	ptExtent.x = 0.0f;
+	ptExtent.y = nLineHeight;
 
-	return fLength;
+	AwPathCoord_t fCurLineWidth = 0.0f;
+
+	for (int i = 0; i < rarrCodepoints.GetItemCount(); i++) {
+		Codepoint nCodepoint = rarrCodepoints[i];
+		switch (nCodepoint) {
+		case '\n':
+			ptExtent.y += nLineHeight;
+			break;
+
+		case '\t':
+			fCurLineWidth += GetTabSize();
+			break;
+
+		case '\r':
+			if (fCurLineWidth > ptExtent.x)
+				ptExtent.x = fCurLineWidth;
+			fCurLineWidth = 0.0f;
+			break;
+
+		default:
+			if (nCodepoint >= ' ')
+				fCurLineWidth += GetGlyph(rarrCodepoints[i]).nWidthPixels;
+		}
+	}
+
+	if (fCurLineWidth > ptExtent.x)
+		ptExtent.x = fCurLineWidth;
+
+	return ptExtent;
 }
 
 AGGWrap::AliasedBitmapFont::AliasedBitmapFont(BufferOf<AwBitmapFontGlyph_t>& rbufGlyphs, const AwFontInfo_t& rinf,
@@ -91,18 +120,35 @@ static void s_CopyScanlines(Source& rgenSource, Dest& rstorDest, Scanline& rsl) 
 void AGGWrap::AliasedBitmapFont::DrawText(Brush::Renderer& rrend, const Brush& rbr, AwPathCoord_t x, AwPathCoord_t y,
 	const Array<Codepoint>& rarrCodepoints, bool bFast) const
 {
-	AwPathCoord_t w = CalculateSize(rarrCodepoints);
-	AwPathCoord_t h = GetInfo().nHeight;
+	AwPathPoint_t ptExtent = CalculateSize(rarrCodepoints);
 
 	agg::scanline_storage_bin storage;
 	AwPathCoord_t fCurXPos = x;
+	AwPathCoord_t fCurYPos = y;
 
 	for (int i = 0; i < rarrCodepoints.GetItemCount(); i++) {
-		Codepoint cp = rarrCodepoints[i];
-		const AwBitmapFontGlyph_t& rglyph = GetGlyph(cp);
-		const Array<AwByte_t>& rarrScanlineData = m_arrGlyphScanlines[GetGlyphIndex(cp)];
+		Codepoint nCodepoint = rarrCodepoints[i];
 
-		agg::serialized_scanlines_adaptor_bin adaptor(rarrScanlineData.GetPointer(), rarrScanlineData.GetItemCount(), fCurXPos, y);
+		switch (nCodepoint) {
+		case '\r':
+			fCurXPos = x;
+			continue;
+
+		case '\n':
+			fCurYPos += GetInfo().nHeight;
+			continue;
+
+		case '\t':
+			fCurXPos += GetTabSize();
+			continue;
+		}
+
+		if (nCodepoint < ' ') continue;
+
+		const AwBitmapFontGlyph_t& rglyph = GetGlyph(nCodepoint);
+		const Array<AwByte_t>& rarrScanlineData = m_arrGlyphScanlines[GetGlyphIndex(nCodepoint)];
+
+		agg::serialized_scanlines_adaptor_bin adaptor(rarrScanlineData.GetPointer(), rarrScanlineData.GetItemCount(), fCurXPos, fCurYPos);
 		agg::serialized_scanlines_adaptor_bin::embedded_scanline sl;
 		sl.reset(0, rglyph.nWidthPixels);
 		s_CopyScanlines(adaptor, storage, sl);
@@ -110,7 +156,7 @@ void AGGWrap::AliasedBitmapFont::DrawText(Brush::Renderer& rrend, const Brush& r
 		fCurXPos += rglyph.nWidthPixels;
 	}
 
-	ManualMinMaxRasterizer<agg::scanline_storage_bin> rast(storage, x, y, w, h);
+	ManualMinMaxRasterizer<agg::scanline_storage_bin> rast(storage, x, y, ptExtent.x, ptExtent.y);
 	rbr.PerformFill(rrend, rast, bFast);
 }
 
@@ -142,14 +188,14 @@ AGGWRAP_EXPIMPL AwBool_t AGGWRAP_FUNC AwGetTextSize(AwFont_h hFont, const char* 
 {
 	try {
 		Font& rfont = *(Font*)hFont;
+		Array<Codepoint> arrCodepoints = ParseUTF8(pcszText);
+		AwPathPoint_t ptExtent = rfont.CalculateSize(arrCodepoints);
 
-		if (pfWidth) {
-			Array<Codepoint> arrCodepoints = ParseUTF8(pcszText);
-			*pfWidth = rfont.CalculateSize(arrCodepoints);
-		}
+		if (pfWidth)
+			*pfWidth = ptExtent.x;
 
 		if (pfHeight)
-			*pfHeight = rfont.GetInfo().nHeight;
+			*pfHeight = ptExtent.y;
 
 		return AGGWRAP_TRUE;
 	} catch (...) {
