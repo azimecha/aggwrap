@@ -80,21 +80,38 @@ AGGWrap::AliasedBitmapFont::AliasedBitmapFont(BufferOf<AwBitmapFontGlyph_t>& rbu
 
 AGGWrap::AliasedBitmapFont::~AliasedBitmapFont(void) {}
 
+template<typename Source, typename Dest, typename Scanline>
+static void s_CopyScanlines(Source& rgenSource, Dest& rstorDest, Scanline& rsl) {
+	if (rgenSource.rewind_scanlines()) {
+		while (rgenSource.sweep_scanline(rsl))
+			rstorDest.render(rsl);
+	}
+}
+
 void AGGWrap::AliasedBitmapFont::DrawText(Brush::Renderer& rrend, const Brush& rbr, AwPathCoord_t x, AwPathCoord_t y,
 	const Array<Codepoint>& rarrCodepoints, bool bFast) const
 {
+	AwPathCoord_t w = CalculateSize(rarrCodepoints);
+	AwPathCoord_t h = GetInfo().nHeight;
+
+	agg::scanline_storage_bin storage;
+	AwPathCoord_t fCurXPos = x;
+
 	for (int i = 0; i < rarrCodepoints.GetItemCount(); i++) {
 		Codepoint cp = rarrCodepoints[i];
 		const AwBitmapFontGlyph_t& rglyph = GetGlyph(cp);
 		const Array<AwByte_t>& rarrScanlineData = m_arrGlyphScanlines[GetGlyphIndex(cp)];
 
-		agg::serialized_scanlines_adaptor_bin adaptor(rarrScanlineData.GetPointer(), rarrScanlineData.GetItemCount(), x, y);
-		ManualMinMaxRasterizer<agg::serialized_scanlines_adaptor_bin> rast(adaptor, x, y, rglyph.nWidthPixels, GetInfo().nHeight);
+		agg::serialized_scanlines_adaptor_bin adaptor(rarrScanlineData.GetPointer(), rarrScanlineData.GetItemCount(), fCurXPos, y);
+		agg::serialized_scanlines_adaptor_bin::embedded_scanline sl;
+		sl.reset(0, rglyph.nWidthPixels);
+		s_CopyScanlines(adaptor, storage, sl);
 
-		rbr.PerformFill(rrend, rast, bFast);
-
-		x += rglyph.nWidthPixels;
+		fCurXPos += rglyph.nWidthPixels;
 	}
+
+	ManualMinMaxRasterizer<agg::scanline_storage_bin> rast(storage, x, y, w, h);
+	rbr.PerformFill(rrend, rast, bFast);
 }
 
 Array<Codepoint> AGGWrap::ParseUTF8(const char* pcszUTF8String) {
