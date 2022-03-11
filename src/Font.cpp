@@ -4,6 +4,27 @@
 
 using namespace AGGWrap;
 
+namespace {
+	template<typename InnerRasterizer>
+	class ManualMinMaxRasterizer : public Rasterizer<InnerRasterizer> {
+	private:
+		int m_nMinX, m_nMinY, m_nMaxX, m_nMaxY;
+
+	public:
+		ManualMinMaxRasterizer(InnerRasterizer& rrast, int x, int y, int w, int h) : Rasterizer(rrast) {
+			m_nMinX = x;
+			m_nMaxX = x + w;
+			m_nMinY = y;
+			m_nMaxY = y + h;
+		}
+
+		int min_x(void) const override { return m_nMinX; }
+		int max_x(void) const override { return m_nMaxX; }
+		int min_y(void) const override { return m_nMinY; }
+		int max_y(void) const override { return m_nMaxY; }
+	};
+}
+
 AGGWrap::Font::~Font(void) {}
 
 AGGWrap::Font::Font(const AwFontInfo_t& rinf) : m_infFont(rinf) {}
@@ -68,7 +89,9 @@ void AGGWrap::AliasedBitmapFont::DrawText(Brush::Renderer& rrend, const Brush& r
 		const Array<AwByte_t>& rarrScanlineData = m_arrGlyphScanlines[GetGlyphIndex(cp)];
 
 		agg::serialized_scanlines_adaptor_bin adaptor(rarrScanlineData.GetPointer(), rarrScanlineData.GetItemCount(), x, y);
-		rbr.PerformFill(rrend, Rasterizer<agg::serialized_scanlines_adaptor_bin>(adaptor), bFast);
+		ManualMinMaxRasterizer<agg::serialized_scanlines_adaptor_bin> rast(adaptor, x, y, rglyph.nWidthPixels, GetInfo().nHeight);
+
+		rbr.PerformFill(rrend, rast, bFast);
 
 		x += rglyph.nWidthPixels;
 	}

@@ -35,10 +35,10 @@ namespace AGGWrap {
 		Rasterizer(InnerRasterizer& rrast) : m_rrast(rrast) {}
 
 		bool rewind_scanlines(void) override { return m_rrast.rewind_scanlines(); }
-		int min_x(void) const override { return m_rrast.min_x(); }
-		int max_x(void) const override { return m_rrast.max_x(); }
-		int min_y(void) const override { return m_rrast.min_y(); }
-		int max_y(void) const override { return m_rrast.max_y(); }
+		virtual int min_x(void) const override { return m_rrast.min_x(); }
+		virtual int max_x(void) const override { return m_rrast.max_x(); }
+		virtual int min_y(void) const override { return m_rrast.min_y(); }
+		virtual int max_y(void) const override { return m_rrast.max_y(); }
 		bool sweep_scanline(Scanline& sl) override { return m_rrast.sweep_scanline(sl); }
 	};
 

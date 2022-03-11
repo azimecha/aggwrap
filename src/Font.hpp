@@ -16,7 +16,7 @@ namespace AGGWrap {
 		virtual void DrawText(Brush::Renderer& rrend, const Brush& rbr, AwPathCoord_t x, AwPathCoord_t y, const Array<Codepoint>& rarrCodepoints,
 			bool bFast) const = 0;
 
-		inline const AwFontInfo_t& GetInfo(void) { return m_infFont; }
+		inline const AwFontInfo_t& GetInfo(void) const { return m_infFont; }
 
 	protected:
 		Font(const AwFontInfo_t& rinf);
