@@ -15,6 +15,13 @@ AGGWrap::Buffer::Buffer(AwBufferInfo_t& rinfBuf) {
 	m_infBuffer = rinfBuf;
 }
 
+AGGWrap::Buffer::Buffer(void* pData, int nSize, AwBufferDestructor_t procDtor, void* tag) {
+	m_infBuffer.nDataSize = nSize;
+	m_infBuffer.pData = pData;
+	m_infBuffer.procDestructor = procDtor;
+	m_infBuffer.tag = tag;
+}
+
 AGGWrap::Buffer::~Buffer(void) {
 	if (m_infBuffer.pData && m_infBuffer.procDestructor)
 		m_infBuffer.procDestructor(m_infBuffer.pData, m_infBuffer.tag);

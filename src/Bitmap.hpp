@@ -14,6 +14,7 @@ namespace AGGWrap {
 	class Bitmap {
 	public:
 		typedef agg::int8u Sample;
+		typedef unsigned char FileData;
 		typedef agg::pixfmt_bgra32_pre PixelFormat;
 
 		static constexpr int SAMPLES_PER_PIXEL = 4;
@@ -21,6 +22,7 @@ namespace AGGWrap {
 		Bitmap(int w, int h);
 		Bitmap(int w, int h, BufferOf<Sample>& rbufSteal);
 		Bitmap(const Bitmap& rbm);
+		Bitmap(const FileData* pFileData, int nFileSize);
 
 		virtual ~Bitmap(void);
 

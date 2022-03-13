@@ -1,4 +1,5 @@
 #include "Bitmap.hpp"
+#include <stb_image.h>
 
 using namespace AGGWrap;
 
@@ -32,6 +33,31 @@ AGGWrap::Bitmap::Bitmap(const Bitmap& rbm) {
 	Attach();
 }
 
+static void AGGWRAP_FUNC s_FreeLoadedImageData(void* pData, void* tag) {
+	stbi_image_free(pData);
+}
+
+static void s_SwapRedBlue(Bitmap::PixelFormat::pixel_type* pData, size_t nPixels) {
+	for (; nPixels > 0; pData++, nPixels--) {
+		register Bitmap::PixelFormat::value_type cTemp = pData->c[0];
+		pData->c[0] = pData->c[2];
+		pData->c[2] = cTemp;
+	}
+}
+
+AGGWrap::Bitmap::Bitmap(const FileData* pFileData, int nFileSize) {
+	int nChannelsInFile;
+	stbi_uc* pPixelData = stbi_load_from_memory((const stbi_uc*)pFileData, nFileSize, &m_nWidth, &m_nHeight, &nChannelsInFile, 4);
+	if (pPixelData == (stbi_uc*)nullptr)
+		throw FileLoadException();
+
+	BufferOf<Sample> bufData((Sample*)pPixelData, m_nWidth * m_nHeight, s_FreeLoadedImageData, nullptr);
+	s_SwapRedBlue((Bitmap::PixelFormat::pixel_type*)pPixelData, (size_t)(m_nWidth * m_nHeight));
+	m_bufData.Steal(bufData);
+
+	Attach();
+}
+
 AGGWrap::Bitmap::~Bitmap(void) {}
 
 void AGGWrap::Bitmap::Attach(void) {
@@ -56,6 +82,17 @@ AGGWRAP_EXPIMPL AwBitmap_h AGGWRAP_FUNC AwCreateBitmapOnBuffer(int w, int h, AwB
 		// don't destroy the client's buffer if we're returning an error
 		buf.Detach();
 		return nullptr;
+	}
+}
+
+AGGWRAP_EXPIMPL AwBitmap_h AGGWRAP_FUNC AwLoadBitmap(const void* pImageFileData, AwDataSize_t nImageFileSize) {
+	try {
+		if (nImageFileSize > INT_MAX)
+			throw new FileLoadException();
+
+		return (AwBitmap_h)new Bitmap((const Bitmap::FileData*)pImageFileData, (int)nImageFileSize);
+	} catch (...) {
+		return (AwBitmap_h)nullptr;
 	}
 }
 

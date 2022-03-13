@@ -27,3 +27,9 @@ const char* AGGWrap::InvalidEnumValueException::GetMessage(void) const {
 }
 
 AGGWrap::InvalidEnumValueException::~InvalidEnumValueException(void) {}
+
+const char* AGGWrap::FileLoadException::GetMessage(void) const {
+	return "Error loading image file";
+}
+
+AGGWrap::FileLoadException::~FileLoadException(void) {}

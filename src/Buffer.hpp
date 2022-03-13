@@ -11,6 +11,7 @@ namespace AGGWrap {
 		constexpr inline Buffer(void) : m_infBuffer() {}
 		Buffer(int nSize);
 		Buffer(AwBufferInfo_t& rinfBuf);
+		Buffer(void* pData, int nSize, AwBufferDestructor_t procDtor, void* tag);
 
 		virtual ~Buffer(void);
 
@@ -35,6 +36,7 @@ namespace AGGWrap {
 		inline BufferOf(void) : Buffer() {}
 		inline BufferOf(int nItems) : Buffer(nItems * sizeof(T)) {}
 		inline BufferOf(AwBufferInfo_t& rinfBuf) : Buffer(rinfBuf) {}
+		inline BufferOf(T* pData, int nItems, AwBufferDestructor_t procDtor, void* tag) : Buffer(pData, nItems*sizeof(T), procDtor, tag) {}
 
 		virtual ~BufferOf(void) {}
 

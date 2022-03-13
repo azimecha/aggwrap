@@ -246,6 +246,12 @@ namespace AGGWrap {
 		SharedObject<T>& m_robj;
 		bool m_bReleased;
 	};
+
+	class FileLoadException : Exception {
+	public:
+		const char* GetMessage(void) const override;
+		virtual ~FileLoadException(void);
+	};
 }
 
 template<typename Scalar>

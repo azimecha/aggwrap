@@ -110,6 +110,7 @@ typedef void* AwFontSet_h;
 
 AGGWRAP_EXPORTED AwBitmap_h AGGWRAP_FUNC AwCreateBitmap(int w, int h);
 AGGWRAP_EXPORTED AwBitmap_h AGGWRAP_FUNC AwCreateBitmapOnBuffer(int w, int h, AwBufferInfo_p pinfBuffer);
+AGGWRAP_EXPORTED AwBitmap_h AGGWRAP_FUNC AwLoadBitmap(const void* pImageFileData, AwDataSize_t nImageFileSize);
 AGGWRAP_EXPORTED AwBool_t AGGWRAP_FUNC AwGetBitmapSize(AwBitmap_h hBitmap, AGGWRAP_OUT int* pnWidth, AGGWRAP_OUT int* pnHeight);
 AGGWRAP_EXPORTED AwBool_t AGGWRAP_FUNC AwGetBitmapDataSize(AwBitmap_h hBitmap, AGGWRAP_OPTIONAL AGGWRAP_OUT int* pnStride, AGGWRAP_OPTIONAL AGGWRAP_OUT int* pnFullSize);
 AGGWRAP_EXPORTED void* AGGWRAP_FUNC AwAccessBitmapData(AwBitmap_h hBitmap);
