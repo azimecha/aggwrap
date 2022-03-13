@@ -20,6 +20,7 @@ namespace AGGWrap {
 		inline const void* GetDataPointer(void) const { return m_infBuffer.pData; }
 
 		void Steal(Buffer& rbuf);
+		void Detach(void);
 
 	private:
 		AGGWRAP_NOCOPY(Buffer, Buffer);

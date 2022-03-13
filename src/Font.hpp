@@ -84,6 +84,7 @@ namespace AGGWrap {
 
 	Array<Codepoint> ParseUTF8(const char* pcszUTF8String);
 	static inline bool GetBitValue(AwByte_t* pBits, unsigned nBit) { return (pBits[nBit >> 3] & (1 << (nBit & 7))) != 0; }
+	Array<char> ConvertUCS2ToUTF8(const wchar_t* pcwzUCS2String);
 }
 
 #endif

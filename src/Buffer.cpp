@@ -30,3 +30,8 @@ void AGGWrap::Buffer::Steal(Buffer& rbuf) {
 		memset((void*)&rbuf.m_infBuffer, 0, sizeof(rbuf.m_infBuffer));
 	}
 }
+
+void AGGWrap::Buffer::Detach(void) {
+	// don't destroy
+	memset((void*)&m_infBuffer, 0, sizeof(m_infBuffer));
+}

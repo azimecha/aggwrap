@@ -60,7 +60,7 @@ namespace AGGWrap {
 		return Color(r, g, b, a);
 	}
 
-	class OutOfRangeException : Exception {
+	class OutOfRangeException : public Exception {
 	public:
 		const char* GetMessage(void) const override;
 		virtual ~OutOfRangeException(void);
@@ -175,7 +175,9 @@ namespace AGGWrap {
 		~SharedObject(void) {
 			T* pObject = m_pObject;
 			m_pObject = (T*)nullptr;
-			delete pObject;
+
+			if (pObject != nullptr)
+				delete pObject;
 		}
 
 	public:
@@ -193,11 +195,18 @@ namespace AGGWrap {
 		inline T* GetPointer(void) { return m_pObject; }
 		inline const T* GetPointer(void) const { return m_pObject; }
 
+		inline T& GetObject(void) { return *m_pObject; }
+		inline const T& GetObject(void) const { return *m_pObject; }
+
 		inline T* operator->(void) { return m_pObject; }
 		inline const T* operator->(void) const { return m_pObject; }
 
 		inline T& operator*(void) { return *m_pObject; }
 		inline const T& operator*(void) const { return *m_pObject; }
+
+		void Detach(void) {
+			m_pObject = (T*)nullptr;
+		}
 
 	private:
 		AGGWRAP_NOCOPY(SharedObject, SharedObject<T>);
@@ -227,6 +236,9 @@ namespace AGGWrap {
 			m_bReleased = true;
 		}
 
+		inline SharedObject<T>& GetSharedObject(void) { return m_robj; }
+		inline const SharedObject<T>& GetSharedObject(void) const { return m_robj; }
+
 	private:
 		AGGWRAP_NOCOPY(SharedObjectReference, SharedObjectReference<T>);
 		AGGWRAP_NOASSIGN(SharedObjectReference<T>);
@@ -234,6 +246,38 @@ namespace AGGWrap {
 		SharedObject<T>& m_robj;
 		bool m_bReleased;
 	};
+}
+
+template<typename Scalar>
+inline static AwPathPoint_t operator+(const AwPathPoint_t& rpt, Scalar a) {
+	AwPathPoint_t pt = rpt;
+	pt.x += a;
+	pt.y += a;
+	return pt;
+}
+
+template<typename Scalar>
+inline static AwPathPoint_t operator-(const AwPathPoint_t& rpt, Scalar a) {
+	AwPathPoint_t pt = rpt;
+	pt.x -= a;
+	pt.y -= a;
+	return pt;
+}
+
+template<typename Scalar>
+inline static AwPathPoint_t operator*(const AwPathPoint_t& rpt, Scalar a) {
+	AwPathPoint_t pt = rpt;
+	pt.x *= a;
+	pt.y *= a;
+	return pt;
+}
+
+template<typename Scalar>
+inline static AwPathPoint_t operator/(const AwPathPoint_t& rpt, Scalar a) {
+	AwPathPoint_t pt = rpt;
+	pt.x /= a;
+	pt.y /= a;
+	return pt;
 }
 
 #endif

@@ -106,6 +106,7 @@ typedef void* AwPath_h;
 typedef void* AwPen_h;
 typedef void* AwContext_h;
 typedef void* AwFont_h;
+typedef void* AwFontSet_h;
 
 AGGWRAP_EXPORTED AwBitmap_h AGGWRAP_FUNC AwCreateBitmap(int w, int h);
 AGGWRAP_EXPORTED AwBitmap_h AGGWRAP_FUNC AwCreateBitmapOnBuffer(int w, int h, AwBufferInfo_p pinfBuffer);
@@ -169,5 +170,11 @@ AGGWRAP_EXPORTED AwBool_t AGGWRAP_FUNC AwGetTextSize(AwFont_h hFont, const char*
 	AGGWRAP_OPTIONAL AGGWRAP_OUT AwPathCoord_p pfHeight);
 AGGWRAP_EXPORTED AwBool_t AGGWRAP_FUNC AwGetFontInfo(AwFont_h hFont, AGGWRAP_OUT AwFontInfo_p pinfFont);
 AGGWRAP_EXPORTED void AGGWRAP_FUNC AwDeleteFont(AwFont_h hFont);
+
+AGGWRAP_EXPORTED AwFontSet_h AGGWRAP_FUNC AwCreateFontSetOnTTF(AwBufferInfo_p pinfDataBuffer);
+AGGWRAP_EXPORTED int AGGWRAP_FUNC AwGetFontSetSize(AwFontSet_h hSet); // returns <0 on fail
+AGGWRAP_EXPORTED const char* AGGWRAP_FUNC AwGetFontNameFromSet(AwFontSet_h hSet, int nFont); // returns nullptr on fail
+AGGWRAP_EXPORTED AwFont_h AGGWRAP_FUNC AwCreateFontFromSet(AwFontSet_h hSet, int nFont, int nHeightPixels);
+AGGWRAP_EXPORTED void AGGWRAP_FUNC AwDeleteFontSet(AwFontSet_h hSet);
 
 #endif

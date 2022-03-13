@@ -48,10 +48,13 @@ AGGWRAP_EXPIMPL AwBitmap_h AGGWRAP_FUNC AwCreateBitmap(int w, int h) {
 }
 
 AGGWRAP_EXPIMPL AwBitmap_h AGGWRAP_FUNC AwCreateBitmapOnBuffer(int w, int h, AwBufferInfo_p pinfBuffer) {
+	BufferOf<Bitmap::Sample> buf(*pinfBuffer);
+
 	try {
-		BufferOf<Bitmap::Sample> buf(*pinfBuffer);
 		return (AwBitmap_h)new Bitmap(w, h, buf);
 	} catch (...) {
+		// don't destroy the client's buffer if we're returning an error
+		buf.Detach();
 		return nullptr;
 	}
 }

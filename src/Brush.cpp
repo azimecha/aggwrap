@@ -183,7 +183,7 @@ void AGGWrap::ScaleBrush::PerformFill(Renderer& rrend, Rasterizer& rrast, bool b
 }
 
 AGGWRAP_EXPIMPL AwBrush_h AGGWRAP_FUNC AwCreateSolidBrush(AwByte_t r, AwByte_t g, AwByte_t b, AwByte_t a) {
-	SolidBrush* pBrush;
+	SolidBrush* pBrush = (SolidBrush*)nullptr;
 
 	try {
 		pBrush = new SolidBrush(Color(r, g, b, a));
@@ -196,7 +196,7 @@ AGGWRAP_EXPIMPL AwBrush_h AGGWRAP_FUNC AwCreateSolidBrush(AwByte_t r, AwByte_t g
 }
 
 AGGWRAP_EXPIMPL AwBrush_h AGGWRAP_FUNC AwCreateLinearGradientBrush(AwGradientStop_p parrStops, int nStops, AwAngle_t fAngle) {
-	LinearGradientBrush* pBrush;
+	LinearGradientBrush* pBrush = (LinearGradientBrush*)nullptr;
 
 	try {
 		Array<GradientStop> arrStopsConv(nStops);
@@ -216,7 +216,7 @@ AGGWRAP_EXPIMPL AwBrush_h AGGWRAP_FUNC AwCreateLinearGradientBrush(AwGradientSto
 }
 
 AGGWRAP_EXPIMPL AwBrush_h AGGWRAP_FUNC AwCreatePatternBrush(AwBitmap_h hBitmap) {
-	PatternBrush* pBrush;
+	PatternBrush* pBrush = (PatternBrush*)nullptr;
 
 	try {
 		pBrush = new PatternBrush(*(Bitmap*)hBitmap);
@@ -229,7 +229,7 @@ AGGWRAP_EXPIMPL AwBrush_h AGGWRAP_FUNC AwCreatePatternBrush(AwBitmap_h hBitmap) 
 }
 
 AGGWRAP_EXPIMPL AwBrush_h AGGWRAP_FUNC AwCreateScaledBrush(AwBitmap_h hBitmap, AwScaleMode_t mode) {
-	ScaleBrush* pBrush;
+	ScaleBrush* pBrush = (ScaleBrush*)nullptr;
 
 	try {
 		pBrush = new ScaleBrush(*(Bitmap*)hBitmap, mode);

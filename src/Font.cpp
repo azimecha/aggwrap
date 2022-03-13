@@ -172,6 +172,24 @@ Array<Codepoint> AGGWrap::ParseUTF8(const char* pcszUTF8String) {
 	return arrParsed;
 }
 
+Array<char> AGGWrap::ConvertUCS2ToUTF8(const wchar_t* pcwzUCS2String) {
+	size_t nChars = 0;
+	const wchar_t* pcwzCur;
+
+	for (pcwzCur = pcwzUCS2String; *pcwzCur; pcwzCur++)
+		nChars += utf8codepointsize((utf8_int32_t)*pcwzCur);
+	nChars++; // null
+
+	Array<char> arrUTF8((int)nChars);
+
+	char* pszCur = arrUTF8.GetPointer();
+	for (pcwzCur = pcwzUCS2String; *pcwzCur; pcwzCur++)
+		utf8catcodepoint(pszCur, *pcwzCur, SIZE_MAX);
+	*pszCur = 0;
+
+	return arrUTF8;
+}
+
 AGGWRAP_EXPIMPL AwFont_h AGGWRAP_FUNC AwCreateMonochromeBitmapFont(AwFontInfo_pc pcinfFont, AwBufferInfo_p pinfGlyphBuffer, int nGlyphZeroChar, int nGlyphCount,
 	int nGlyphDefault) 
 {
