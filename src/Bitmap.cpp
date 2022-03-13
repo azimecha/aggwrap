@@ -46,6 +46,10 @@ static void s_SwapRedBlue(Bitmap::PixelFormat::pixel_type* pData, size_t nPixels
 }
 
 AGGWrap::Bitmap::Bitmap(const FileData* pFileData, int nFileSize) {
+	// stb_image provides no way to make images always load premultiplied, or detect if an image is premultiplied already
+	// the only option to ensure correct loading is to enable this flag and then always premultiply
+	stbi_set_unpremultiply_on_load(1);
+
 	int nChannelsInFile;
 	stbi_uc* pPixelData = stbi_load_from_memory((const stbi_uc*)pFileData, nFileSize, &m_nWidth, &m_nHeight, &nChannelsInFile, 4);
 	if (pPixelData == (stbi_uc*)nullptr)
@@ -56,6 +60,7 @@ AGGWrap::Bitmap::Bitmap(const FileData* pFileData, int nFileSize) {
 	m_bufData.Steal(bufData);
 
 	Attach();
+	m_fmt.premultiply();
 }
 
 AGGWrap::Bitmap::~Bitmap(void) {}

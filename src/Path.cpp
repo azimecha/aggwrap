@@ -94,7 +94,7 @@ void AGGWrap::Path::AddPieSlice(AwPathCoord_t x, AwPathCoord_t y, AwPathCoord_t 
 	agg::arc arc(cx, cy, (x1 - x0) / 2, (y1 - y0) / 2, -fStartAngle, -fSweepAngle, false);
 	arc.approximation_scale(1);
 	m_storage.concat_path(arc);
-	m_storage.line_to(x, y);
+	m_storage.line_to(x0, y1);
 	m_storage.close_polygon();
 }
 
