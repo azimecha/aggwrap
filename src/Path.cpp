@@ -72,8 +72,7 @@ void AGGWrap::Path::AddArc(AwPathCoord_t x, AwPathCoord_t y, AwPathCoord_t w, Aw
 	float x1 = x + w;
 	float y1 = y + h;
 
-	agg::arc arc((x1 + x0) / 2, (y1 + y0) / 2, (x1 - x0) / 2, (y1 - y0) / 2,
-		-fStartAngle, -fSweepAngle, false);
+	agg::arc arc((x1 + x0) / 2, (y1 + y0) / 2, (x1 - x0) / 2, (y1 - y0) / 2, -fStartAngle, -fStartAngle - fSweepAngle, false);
 	arc.approximation_scale(1);
 	m_storage.concat_path(arc);
 }
@@ -84,17 +83,9 @@ void AGGWrap::Path::AddChord(AwPathCoord_t x, AwPathCoord_t y, AwPathCoord_t w, 
 }
 
 void AGGWrap::Path::AddPieSlice(AwPathCoord_t x, AwPathCoord_t y, AwPathCoord_t w, AwPathCoord_t h, AwPathCoord_t fStartAngle, AwPathCoord_t fSweepAngle) {
-	float x0 = x;
-	float y0 = y;
-	float x1 = x + w;
-	float y1 = y + h;
-	float cx = (x1 + x0) / 2;
-	float cy = (y1 + y0) / 2;
-
-	agg::arc arc(cx, cy, (x1 - x0) / 2, (y1 - y0) / 2, -fStartAngle, -fSweepAngle, false);
-	arc.approximation_scale(1);
-	m_storage.concat_path(arc);
-	m_storage.line_to(x0, y1);
+	m_storage.move_to(x + w / 2, y + h / 2);
+	AddArc(x, y, w, h, fStartAngle, fSweepAngle);
+	m_storage.line_to(x + w / 2, y + h / 2);
 	m_storage.close_polygon();
 }
 
